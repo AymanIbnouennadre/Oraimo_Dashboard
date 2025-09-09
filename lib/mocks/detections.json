@@ -1,0 +1,122 @@
+[
+  {
+    "id": "det_001",
+    "date": "2024-01-15T14:20:00Z",
+    "user_id": "4",
+    "user_name": "Sophie Bernard",
+    "product_id": "1",
+    "product_name": "Oraimo FreePods 3",
+    "model_version": "v2.1.0",
+    "confidence": 0.95,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_002",
+    "date": "2024-01-14T16:45:00Z",
+    "user_id": "2",
+    "user_name": "Marie Martin",
+    "product_id": "2",
+    "product_name": "PowerBank 20K",
+    "model_version": "v2.1.0",
+    "confidence": 0.88,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_003",
+    "date": "2024-01-13T15:20:00Z",
+    "user_id": "5",
+    "user_name": "Luc Moreau",
+    "product_id": "4",
+    "product_name": "SoundGo Speaker",
+    "model_version": "v2.0.5",
+    "confidence": 0.92,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_004",
+    "date": "2024-01-12T14:10:00Z",
+    "user_id": "4",
+    "user_name": "Sophie Bernard",
+    "product_id": "5",
+    "product_name": "SmartWatch Pro",
+    "model_version": "v2.1.0",
+    "confidence": 0.97,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_005",
+    "date": "2024-01-11T16:30:00Z",
+    "user_id": "2",
+    "user_name": "Marie Martin",
+    "product_id": "3",
+    "product_name": "Câble USB-C",
+    "model_version": "v2.0.5",
+    "confidence": 0.73,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_006",
+    "date": "2024-01-11T10:15:00Z",
+    "user_id": "3",
+    "user_name": "Pierre Durand",
+    "product_id": "1",
+    "product_name": "Oraimo FreePods 3",
+    "model_version": "v2.0.5",
+    "confidence": 0.45,
+    "success": false,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_007",
+    "date": "2024-01-10T13:45:00Z",
+    "user_id": "1",
+    "user_name": "Jean Dupont",
+    "product_id": "2",
+    "product_name": "PowerBank 20K",
+    "model_version": "v2.1.0",
+    "confidence": 0.91,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_008",
+    "date": "2024-01-10T09:30:00Z",
+    "user_id": "4",
+    "user_name": "Sophie Bernard",
+    "product_id": "4",
+    "product_name": "SoundGo Speaker",
+    "model_version": "v2.1.0",
+    "confidence": 0.86,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_009",
+    "date": "2024-01-09T17:20:00Z",
+    "user_id": "2",
+    "user_name": "Marie Martin",
+    "product_id": "5",
+    "product_name": "SmartWatch Pro",
+    "model_version": "v2.0.5",
+    "confidence": 0.38,
+    "success": false,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  },
+  {
+    "id": "det_010",
+    "date": "2024-01-09T11:00:00Z",
+    "user_id": "5",
+    "user_name": "Luc Moreau",
+    "product_id": "3",
+    "product_name": "Câble USB-C",
+    "model_version": "v2.1.0",
+    "confidence": 0.89,
+    "success": true,
+    "image_url": "/placeholder.svg?height=300&width=300"
+  }
+]

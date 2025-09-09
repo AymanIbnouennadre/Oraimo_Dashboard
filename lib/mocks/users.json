@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "name": "Jean Dupont",
+    "phone": "+33123456789",
+    "email": "jean.dupont@email.com",
+    "role": "ADMIN",
+    "tier": "GOLD",
+    "enabled": true,
+    "points_total": 2500,
+    "last_activity": "2024-01-15T10:30:00Z",
+    "created": "2023-06-15T09:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Marie Martin",
+    "phone": "+33987654321",
+    "email": "marie.martin@email.com",
+    "role": "CUSTOMER",
+    "tier": "SILVER",
+    "enabled": true,
+    "points_total": 1200,
+    "last_activity": "2024-01-14T16:45:00Z",
+    "created": "2023-08-20T14:30:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Pierre Durand",
+    "phone": "+33456789123",
+    "email": "pierre.durand@email.com",
+    "role": "CUSTOMER",
+    "tier": "BRONZE",
+    "enabled": false,
+    "points_total": 450,
+    "last_activity": "2024-01-10T08:15:00Z",
+    "created": "2023-11-05T11:20:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Sophie Bernard",
+    "phone": "+33789123456",
+    "email": "sophie.bernard@email.com",
+    "role": "CUSTOMER",
+    "tier": "GOLD",
+    "enabled": true,
+    "points_total": 3200,
+    "last_activity": "2024-01-15T12:00:00Z",
+    "created": "2023-05-10T10:00:00Z"
+  },
+  {
+    "id": "5",
+    "name": "Luc Moreau",
+    "phone": "+33321654987",
+    "email": "luc.moreau@email.com",
+    "role": "CUSTOMER",
+    "tier": "SILVER",
+    "enabled": true,
+    "points_total": 890,
+    "last_activity": "2024-01-13T14:20:00Z",
+    "created": "2023-09-15T16:45:00Z"
+  }
+]

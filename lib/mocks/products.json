@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "sku": "ORA-EAR-001",
+    "model": "FreePods 3",
+    "marketing_name": "Oraimo FreePods 3 - Écouteurs Sans Fil",
+    "category": "Audio",
+    "retail_price": 79.99,
+    "final_price": 59.99,
+    "points_gold": 120,
+    "points_silver": 100,
+    "points_bronze": 80,
+    "image_url": "/placeholder.svg?height=200&width=200",
+    "created": "2023-06-01T10:00:00Z"
+  },
+  {
+    "id": "2",
+    "sku": "ORA-CHG-002",
+    "model": "PowerBank 20K",
+    "marketing_name": "Oraimo PowerBank 20000mAh Charge Rapide",
+    "category": "Chargeurs",
+    "retail_price": 49.99,
+    "final_price": 39.99,
+    "points_gold": 80,
+    "points_silver": 65,
+    "points_bronze": 50,
+    "image_url": "/placeholder.svg?height=200&width=200",
+    "created": "2023-06-15T14:30:00Z"
+  },
+  {
+    "id": "3",
+    "sku": "ORA-CAB-003",
+    "model": "Cable USB-C",
+    "marketing_name": "Câble USB-C Oraimo Charge Rapide 3A",
+    "category": "Accessoires",
+    "retail_price": 19.99,
+    "final_price": 14.99,
+    "points_gold": 30,
+    "points_silver": 25,
+    "points_bronze": 20,
+    "image_url": "/placeholder.svg?height=200&width=200",
+    "created": "2023-07-01T09:15:00Z"
+  },
+  {
+    "id": "4",
+    "sku": "ORA-SPK-004",
+    "model": "SoundGo Speaker",
+    "marketing_name": "Oraimo SoundGo Enceinte Bluetooth Portable",
+    "category": "Audio",
+    "retail_price": 89.99,
+    "final_price": 69.99,
+    "points_gold": 140,
+    "points_silver": 115,
+    "points_bronze": 90,
+    "image_url": "/placeholder.svg?height=200&width=200",
+    "created": "2023-07-20T11:45:00Z"
+  },
+  {
+    "id": "5",
+    "sku": "ORA-WAT-005",
+    "model": "SmartWatch Pro",
+    "marketing_name": "Oraimo SmartWatch Pro Montre Connectée",
+    "category": "Wearables",
+    "retail_price": 129.99,
+    "final_price": 99.99,
+    "points_gold": 200,
+    "points_silver": 165,
+    "points_bronze": 130,
+    "image_url": "/placeholder.svg?height=200&width=200",
+    "created": "2023-08-10T13:20:00Z"
+  }
+]
