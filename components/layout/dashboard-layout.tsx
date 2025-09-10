@@ -1,6 +1,7 @@
+// components/layouts/dashboard-layout.tsx (ou l'emplacement actuel)
 "use client"
 
-import type React from "react"
+import React, { useState } from "react"
 import { usePathname } from "next/navigation"
 import {
   Sidebar,
@@ -34,9 +35,26 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
+/** Overlay plein écran réutilisable */
+function LoadingOverlay({ show, label = "Processing..." }: { show: boolean; label?: string }) {
+  if (!show) return null
+  return (
+    <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm flex items-center justify-center">
+      <div className="flex items-center gap-3 rounded-xl bg-card/95 px-4 py-3 shadow-2xl">
+        <span
+          aria-hidden
+          className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"
+        />
+        <span className="text-sm font-medium text-foreground">{label}</span>
+      </div>
+    </div>
+  )
+}
+
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { session, logout } = useAuth()
   const pathname = usePathname()
+  const [signingOut, setSigningOut] = useState(false)
 
   const navigationItems = [
     {
@@ -50,7 +68,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: Users,
       isActive: pathname.startsWith("/dashboard/users"),
       items: [
-        { title: "Management", href: "/dashboard/users", isActive: pathname === "/dashboard/users" },
+        { title: "Management", href: "/dashboard/users, isActive: pathname === \"/dashboard/users\"" },
         { title: "Analytics", href: "/dashboard/users/analytics", isActive: pathname === "/dashboard/users/analytics" },
       ],
     },
@@ -85,6 +103,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
+      {/* Overlay plein écran pendant la déconnexion */}
+      <LoadingOverlay show={signingOut} label="Signing out…" />
+
       <div className="flex min-h-screen w-full bg-background">
         {/* Main Sidebar */}
         <Sidebar className="border-r border-border">
@@ -152,7 +173,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <SidebarMenu className="p-2">
               <SidebarMenuItem>
                 <DropdownMenu>
-                  {/* ✅ Trigger robuste: élément natif qui supporte ref */}
+                  {/* Trigger natif (meilleure compat) */}
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
@@ -178,10 +199,33 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="flex items-center gap-2 text-destructive">
-                      <LogOut className="h-4 w-4" />
-                      Sign Out
+                    {/* Sign Out avec overlay + anti double-clic */}
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        if (signingOut) return
+                        setSigningOut(true)
+                        // laisse le menu se fermer + rend l’overlay, puis lance le logout
+                        requestAnimationFrame(() => {
+                          setTimeout(() => {
+                            logout() // supprime le cookie + push("/login")
+                          }, 100) // 80–120ms suffit
+                        })
+                      }}
+                      className={`flex items-center gap-2 text-destructive ${signingOut ? "opacity-60 pointer-events-none" : ""}`}
+                    >
+                      <span
+                        aria-hidden
+                        className={`h-4 w-4 rounded-full border-2 ${signingOut ? "animate-spin border-current border-t-transparent" : "border-transparent"
+                          }`}
+                      />
+                      {signingOut ? "Signing out…" : (
+                        <>
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </>
+                      )}
                     </DropdownMenuItem>
+
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuItem>
