@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { formatNumber } from "@/lib/utils"
 import { MoreHorizontal, Pencil, Trash2, Eye, Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -90,7 +91,7 @@ export function StockTable({ movements, onEdit, onDelete, onAdd }: Props) {
                 </TableCell>
 
                 <TableCell className="text-right">{m.quantity}</TableCell>
-                <TableCell className="text-right">{m.points?.toLocaleString?.() ?? m.points}</TableCell>
+                <TableCell className="text-right">{m.points ? formatNumber(m.points) : m.points}</TableCell>
                 <TableCell>{m.user_name}</TableCell>
                 <TableCell>
                   {m.date ? new Date(m.date).toLocaleString() : "-"}

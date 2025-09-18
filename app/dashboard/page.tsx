@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react"
 import Link from "next/link"
+import { formatPoints } from "@/lib/utils"
 
 const mockKPIs = [
   {
@@ -131,7 +132,7 @@ export default function DashboardHomePage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-foreground">{product.points.toLocaleString()} pts</p>
+                    <p className="font-semibold text-foreground">{formatPoints(product.points)}</p>
                   </div>
                 </div>
               ))}
@@ -182,7 +183,7 @@ export default function DashboardHomePage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-foreground">{user.points.toLocaleString()} pts</p>
+                    <p className="font-semibold text-foreground">{formatPoints(user.points)}</p>
                   </div>
                 </div>
               ))}

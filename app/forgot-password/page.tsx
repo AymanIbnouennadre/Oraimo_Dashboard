@@ -8,23 +8,36 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, ArrowLeft, CheckCircle } from "lucide-react"
+import { Loader2, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react"
+import { forgotPasswordService } from "@/lib/auth"
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState("")
   const [email, setEmail] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    setIsLoading(false)
-    setIsSuccess(true)
+    try {
+      // Le backend va gérer toute la validation (email existe + rôle admin)
+      const result = await forgotPasswordService.forgotPassword(email)
+      
+      if (result.success) {
+        // Rediriger vers la page de vérification du code avec l'email
+        router.push(`/verify-code?email=${encodeURIComponent(email)}`)
+      } else {
+        setError(result.message || "An error occurred")
+      }
+    } catch (err) {
+      setError("Connection error. Please try again")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (isSuccess) {
@@ -35,12 +48,12 @@ export default function ForgotPasswordPage() {
             <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
               <CheckCircle className="h-6 w-6 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl font-bold">Email envoyé</CardTitle>
-            <CardDescription>Un lien de réinitialisation a été envoyé à votre adresse email</CardDescription>
+            <CardTitle className="text-2xl font-bold">Email Sent</CardTitle>
+            <CardDescription>A password reset link has been sent to your email address. Check your inbox and click the link to reset your password.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => router.push("/login")} className="w-full">
-              Retour à la connexion
+              Back to Login
             </Button>
           </CardContent>
         </Card>
@@ -55,17 +68,24 @@ export default function ForgotPasswordPage() {
           <div className="mx-auto mb-4 h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-xl">O</span>
           </div>
-          <CardTitle className="text-2xl font-bold">Mot de passe oublié</CardTitle>
-          <CardDescription>Entrez votre email pour recevoir un lien de réinitialisation</CardDescription>
+          <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
+          <CardDescription>Enter your email to receive a verification code</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="votre.email@example.com"
+                placeholder="your.email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -75,7 +95,7 @@ export default function ForgotPasswordPage() {
 
             <Button type="submit" className="w-full" disabled={isLoading || !email}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Envoyer le lien
+              Send Verification Code
             </Button>
 
             <Button
@@ -86,7 +106,7 @@ export default function ForgotPasswordPage() {
               disabled={isLoading}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour à la connexion
+              Back to Login
             </Button>
           </form>
         </CardContent>

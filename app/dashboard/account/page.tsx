@@ -12,7 +12,7 @@ import { Loader2, User, Lock, CheckCircle, Shield } from "lucide-react"
 import { useAuth } from "@/components/auth/auth-provider"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080"
-const MA_PHONE_REGEX = /^0[67]\d{8}$/ // 06/07 + 8 chiffres = 10 au total
+const MA_PHONE_REGEX = /^0[67]\d{8}$/ // 06/07 + 8 digits = 10 total
 
 type UserDto = {
   id: number
@@ -48,7 +48,6 @@ function decodeJwt(token: string): any | null {
 
 function getUserIdFromToken(token: string): number | null {
   const payload = decodeJwt(token)
-  console.log("Payload décodé:", payload) // Pour debug
   
   // Votre backend met l'ID dans le claim 'uid'
   const uid = payload?.uid
@@ -56,14 +55,12 @@ function getUserIdFromToken(token: string): number | null {
   if (uid !== undefined && uid !== null) {
     // Si uid est déjà un nombre
     if (typeof uid === "number" && !Number.isNaN(uid)) {
-      console.log("UID trouvé comme nombre:", uid)
       return uid
     }
     // Si uid est une string, essayer de la convertir
     if (typeof uid === "string") {
       const numericId = Number(uid)
       if (!Number.isNaN(numericId)) {
-        console.log("UID trouvé comme string et converti:", numericId)
         return numericId
       }
     }
@@ -74,12 +71,10 @@ function getUserIdFromToken(token: string): number | null {
   if (sub !== undefined && sub !== null) {
     const numericId = Number(sub)
     if (!Number.isNaN(numericId)) {
-      console.log("SUB trouvé et converti:", numericId)
       return numericId
     }
   }
   
-  console.error("Impossible d'extraire l'ID utilisateur du token. Payload:", payload)
   return null
 }
 
@@ -110,33 +105,24 @@ export default function AccountPage() {
   // ---- Charger l'utilisateur courant via GET /api/users/{id}
   useEffect(() => {
     const token = getCookie("oraimo_token")
-    console.log("Token trouvé:", token ? "Oui" : "Non")
-    console.log("Backend URL:", BACKEND_URL)
     
     if (!token) {
       setIsFetching(false)
-      setError("Session invalide. Veuillez vous reconnecter.")
+      setError("Invalid session. Please log in again.")
       return
     }
     
-    // Décodez le token pour voir son contenu
-    const payload = decodeJwt(token)
-    console.log("Contenu du token:", payload)
-    
     const id = getUserIdFromToken(token)
-    console.log("ID utilisateur extrait:", id)
     
     if (!id) {
       setIsFetching(false)
-      setError("Session invalide. Impossible d'extraire l'ID utilisateur du token.")
+      setError("Invalid session. Unable to extract user ID from token.")
       return
     }
 
     ;(async () => {
       try {
-        console.log(`Tentative de récupération de l'utilisateur ${id}...`)
         const url = `${BACKEND_URL}/api/users/${id}`
-        console.log("URL de l'API:", url)
         
         const res = await fetch(url, {
           headers: { 
@@ -145,18 +131,13 @@ export default function AccountPage() {
           },
         })
         
-        console.log("Statut de la réponse:", res.status)
-        console.log("Headers de réponse:", Object.fromEntries(res.headers))
-        
         if (!res.ok) {
           const t = await res.text()
-          console.error("Erreur de l'API:", t)
-          setError(t || `Erreur HTTP ${res.status}: Impossible de récupérer votre profil.`)
+          setError(t || `HTTP Error ${res.status}: Unable to retrieve your profile.`)
           return
         }
         
         const u: UserDto = await res.json()
-        console.log("Données utilisateur reçues:", u)
         
         setUser(u)
         setProfileData({
@@ -167,11 +148,10 @@ export default function AccountPage() {
           address: u.address || "",
         })
       } catch (err) {
-        console.error("Erreur détaillée:", err)
         if (err instanceof TypeError && err.message.includes('fetch')) {
-          setError(`Impossible de se connecter au serveur (${BACKEND_URL}). Vérifiez que le serveur est démarré.`)
+          setError(`Unable to connect to server. Please check if the server is running.`)
         } else {
-          setError(`Erreur réseau lors du chargement du profil: ${err}`)
+          setError(`Network error while loading profile.`)
         }
       } finally {
         setIsFetching(false)
@@ -179,7 +159,7 @@ export default function AccountPage() {
     })()
   }, [])
 
-  // ---- Sauvegarder le profil via PUT /api/users/{id}
+  // ---- Save profile via PUT /api/users/{id}
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -188,26 +168,25 @@ export default function AccountPage() {
     // Validation du téléphone
     const phone = profileData.phone.replace(/\D/g, "")
     if (phone && !MA_PHONE_REGEX.test(phone)) {
-      setError("Le numéro doit commencer par 06/07 et contenir exactement 10 chiffres.")
+      setError("Phone number must start with 06/07 and contain exactly 10 digits.")
       return
     }
 
     // Validation email
     if (!profileData.email.trim()) {
-      setError("L'email est requis.")
+      setError("Email is required.")
       return
     }
 
     if (!user) return
     const token = getCookie("oraimo_token")
     if (!token) {
-      setError("Session expirée. Veuillez vous reconnecter.")
+      setError("Session expired. Please log in again.")
       return
     }
 
     setIsLoadingProfile(true)
     try {
-      console.log("Sauvegarde du profil pour l'utilisateur:", user.id)
       const payload = {
         id: user.id,
         firstName: profileData.firstName.trim(),
@@ -219,7 +198,6 @@ export default function AccountPage() {
         storeTiers: user.storeTiers,
         role: user.role,
       }
-      console.log("Payload envoyé:", payload)
       
       const res = await fetch(`${BACKEND_URL}/api/users/${user.id}`, {
         method: "PUT",
@@ -229,56 +207,51 @@ export default function AccountPage() {
         },
         body: JSON.stringify(payload),
       })
-
-      console.log("Statut de sauvegarde:", res.status)
       
       if (!res.ok) {
         const t = await res.text()
-        console.error("Erreur de sauvegarde:", t)
-        setError(t || `Erreur HTTP ${res.status}: Échec de la sauvegarde du profil.`)
+        setError(t || `HTTP Error ${res.status}: Failed to save profile.`)
         return
       }
       
       const updatedUser = await res.json()
-      console.log("Utilisateur mis à jour:", updatedUser)
       setUser(updatedUser)
       setProfileSuccess(true)
       setTimeout(() => setProfileSuccess(false), 3000)
     } catch (err) {
-      console.error("Erreur de sauvegarde:", err)
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        setError(`Impossible de se connecter au serveur pour la sauvegarde.`)
+        setError(`Unable to connect to server for saving.`)
       } else {
-        setError(`Erreur réseau lors de la sauvegarde: ${err}`)
+        setError(`Erreur réseau lors de la sauvegarde.`)
       }
     } finally {
       setIsLoadingProfile(false)
     }
   }
 
-  // ---- Mot de passe (simulation tant que l'endpoint n'existe pas)
+  // ---- Password (simulation until endpoint exists)
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setPasswordSuccess(false)
 
     if (!passwordData.currentPassword.trim()) {
-      setError("Le mot de passe actuel est requis.")
+      setError("Current password is required.")
       return
     }
 
     if (!passwordData.newPassword.trim()) {
-      setError("Le nouveau mot de passe est requis.")
+      setError("New password is required.")
       return
     }
 
     if (passwordData.newPassword.length < 6) {
-      setError("Le nouveau mot de passe doit contenir au moins 6 caractères.")
+      setError("New password must contain at least 6 characters.")
       return
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.")
+      setError("Passwords do not match.")
       return
     }
 
@@ -306,21 +279,6 @@ export default function AccountPage() {
         </Alert>
       )}
 
-      {/* Informations de debug */}
-      {process.env.NODE_ENV === 'development' && (
-        <Card className="border-yellow-500 bg-yellow-50">
-          <CardHeader>
-            <CardTitle className="text-sm text-yellow-800">Debug Info</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xs text-yellow-700">
-            <p>Backend URL: {BACKEND_URL}</p>
-            <p>User ID: {user?.id || 'Non chargé'}</p>
-            <p>Token présent: {getCookie("oraimo_token") ? 'Oui' : 'Non'}</p>
-            <p>Payload JWT: {JSON.stringify(decodeJwt(getCookie("oraimo_token") || ""), null, 2)}</p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Profile Information */}
       <Card className="border-border shadow-sm">
         <CardHeader className="bg-card">
@@ -338,7 +296,8 @@ export default function AccountPage() {
             </div>
           ) : (
             <form onSubmit={handleProfileSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Première ligne : First Name, Last Name, Email */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="firstName" className="text-sm font-medium text-foreground">
                     First Name
@@ -365,77 +324,77 @@ export default function AccountPage() {
                     placeholder="Enter your last name"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                  Email <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={profileData.email}
-                  onChange={(e) => setProfileData((prev) => ({ ...prev, email: e.target.value }))}
-                  disabled={isLoadingProfile}
-                  className="h-11"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-medium text-foreground">
-                  Phone
-                </Label>
-                <Input
-                  id="phone"
-                  value={profileData.phone}
-                  maxLength={10}
-                  inputMode="numeric"
-                  onChange={(e) => {
-                    const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 10)
-                    setProfileData((prev) => ({ ...prev, phone: onlyDigits }))
-                  }}
-                  disabled={isLoadingProfile}
-                  className="h-11"
-                  placeholder="0600000002"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="address" className="text-sm font-medium text-foreground">
-                  Address
-                </Label>
-                <Input
-                  id="address"
-                  value={profileData.address}
-                  onChange={(e) => setProfileData((prev) => ({ ...prev, address: e.target.value }))}
-                  disabled={isLoadingProfile}
-                  className="h-11"
-                  placeholder="Enter your address"
-                />
-              </div>
-
-              {/* Role - Read Only */}
-              {user && (
                 <div className="space-y-2">
-                  <Label htmlFor="role" className="text-sm font-medium text-foreground">
-                    Role
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                    Email <span className="text-destructive">*</span>
                   </Label>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      id="role"
-                      value={user.role}
-                      disabled
-                      className="h-11 bg-muted"
-                    />
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Shield className="h-4 w-4" />
-                      <span className="text-sm">Read only</span>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileData.email}
+                    onChange={(e) => setProfileData((prev) => ({ ...prev, email: e.target.value }))}
+                    disabled={isLoadingProfile}
+                    className="h-11"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Deuxième ligne : Phone, Address, Role */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-medium text-foreground">
+                    Phone
+                  </Label>
+                  <Input
+                    id="phone"
+                    value={profileData.phone}
+                    maxLength={10}
+                    inputMode="numeric"
+                    onChange={(e) => {
+                      const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 10)
+                      setProfileData((prev) => ({ ...prev, phone: onlyDigits }))
+                    }}
+                    disabled={isLoadingProfile}
+                    className="h-11"
+                    placeholder="0600000002"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address" className="text-sm font-medium text-foreground">
+                    Address
+                  </Label>
+                  <Input
+                    id="address"
+                    value={profileData.address}
+                    onChange={(e) => setProfileData((prev) => ({ ...prev, address: e.target.value }))}
+                    disabled={isLoadingProfile}
+                    className="h-11"
+                    placeholder="Enter your address"
+                  />
+                </div>
+                {/* Role - Read Only */}
+                {user && (
+                  <div className="space-y-2">
+                    <Label htmlFor="role" className="text-sm font-medium text-foreground">
+                      Role
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="role"
+                        value={user.role}
+                        disabled
+                        className="h-11 bg-muted flex-1"
+                      />
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-xs">Read only</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="flex items-center gap-3">
                 <Button type="submit" disabled={isLoadingProfile} className="h-11 px-6">

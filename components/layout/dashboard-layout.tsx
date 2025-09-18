@@ -68,7 +68,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: Users,
       isActive: pathname.startsWith("/dashboard/users"),
       items: [
-        { title: "Management", href: "/dashboard/users, isActive: pathname === \"/dashboard/users\"" },
+        { title: "Management", href: "/dashboard/users", isActive: pathname === "/dashboard/users" },
         { title: "Analytics", href: "/dashboard/users/analytics", isActive: pathname === "/dashboard/users/analytics" },
       ],
     },

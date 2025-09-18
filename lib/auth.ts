@@ -1,5 +1,5 @@
 // Authentication utilities and session management for Oraimo Admin
-import type { User } from "./types"
+import type { User, ForgotPasswordRequest, ForgotPasswordResponse, ResetPasswordRequest, ResetPasswordResponse, VerifyOtpRequest, VerifyOtpResponse } from "./types"
 
 export interface AuthSession {
   user: User
@@ -91,4 +91,191 @@ export const mockAuth = {
   isAuthorized(session: AuthSession | null): boolean {
     return session?.user?.role === "ADMIN" && session?.user?.enabled === true
   },
+}
+
+// Forgot Password Service
+export const forgotPasswordService = {
+  async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    try {
+      const response = await fetch('http://localhost:8080/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email } as ForgotPasswordRequest),
+      })
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: 'Verification code has been sent to your email address'
+        }
+      } else {
+        // Handle different error status codes
+        let errorMessage = 'An error occurred. Please try again'
+        
+        try {
+          // Try to extract error message from backend response
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          } else if (errorData.error) {
+            errorMessage = errorData.error
+          }
+        } catch (parseError) {
+          // If we can't parse JSON, use default messages based on status code
+          if (response.status === 404) {
+            errorMessage = 'No account found with this email address'
+          } else if (response.status === 403) {
+            errorMessage = 'Password reset is only available for administrator accounts'
+          } else if (response.status === 429) {
+            errorMessage = 'Too many attempts. Please try again later'
+          }
+        }
+        
+        // Override with English messages for specific status codes
+        if (response.status === 404) {
+          errorMessage = 'No account found with this email address'
+        } else if (response.status === 403) {
+          errorMessage = 'Password reset is only available for administrator accounts'
+        } else if (response.status === 429) {
+          errorMessage = 'Too many attempts. Please try again later'
+        }
+        
+        return {
+          success: false,
+          message: errorMessage
+        }
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error)
+      return {
+        success: false,
+        message: 'Connection error. Please check your internet connection'
+      }
+    }
+  }
+}
+
+// Verify OTP Service (Step 2)
+export const verifyOtpService = {
+  async verifyCode(email: string, code: string): Promise<VerifyOtpResponse> {
+    try {
+      const response = await fetch('http://localhost:8080/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, code } as VerifyOtpRequest),
+      })
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: 'Code verified successfully',
+          resetToken: 'verified' // Pas de token réel, juste indication de succès
+        }
+      } else {
+        // Handle different error status codes
+        let errorMessage = 'An error occurred. Please try again'
+        
+        try {
+          // Try to extract error message from backend response
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          } else if (errorData.error) {
+            errorMessage = errorData.error
+          }
+        } catch (parseError) {
+          // If we can't parse JSON, use default messages based on status code
+        }
+        
+        // Override with English messages for specific status codes
+        if (response.status === 400) {
+          errorMessage = 'Invalid or expired verification code'
+        } else if (response.status === 404) {
+          // Check if it's the endpoint not found vs no reset request
+          try {
+            const errorText = await response.text()
+            if (errorText.includes('Cannot') || errorText.includes('Not Found')) {
+              errorMessage = 'Backend service unavailable. Please contact support.'
+            } else {
+              errorMessage = 'No reset request found for this email'
+            }
+          } catch {
+            errorMessage = 'No reset request found for this email'
+          }
+        } else if (response.status === 410) {
+          // Code expired (if backend uses 410 for expired codes)
+          errorMessage = 'Verification code has expired. Please request a new code.'
+        } else if (response.status === 429) {
+          errorMessage = 'Too many attempts. Please try again later'
+        } else if (response.status === 422) {
+          // Invalid code format or incorrect code
+          errorMessage = 'Invalid verification code. Please check and try again.'
+        }
+        
+        return {
+          success: false,
+          message: errorMessage
+        }
+      }
+    } catch (error) {
+      console.error('Verify code error:', error)
+      return {
+        success: false,
+        message: 'Connection error. Please check your internet connection'
+      }
+    }
+  }
+}
+
+// Reset Password Service
+export const resetPasswordService = {
+  async resetPassword(email: string, code: string, newPassword: string): Promise<ResetPasswordResponse> {
+    try {
+      const response = await fetch('http://localhost:8080/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, code, newPassword } as ResetPasswordRequest),
+      })
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: 'Password reset successfully'
+        }
+      } else {
+        // Handle different error status codes
+        if (response.status === 400) {
+          return {
+            success: false,
+            message: 'Invalid or expired reset token'
+          }
+        } else if (response.status === 404) {
+          return {
+            success: false,
+            message: 'Reset token not found'
+          }
+        } else {
+          return {
+            success: false,
+            message: 'An error occurred. Please try again'
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Reset password error:', error)
+      return {
+        success: false,
+        message: 'Connection error. Please check your internet connection'
+      }
+    }
+  }
 }

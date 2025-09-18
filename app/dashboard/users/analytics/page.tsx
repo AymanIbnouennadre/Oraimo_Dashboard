@@ -9,6 +9,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Users, UserPlus, Activity, UserCheck, Download, TrendingUp } from "lucide-react"
 import { SectionTabs } from "@/components/layout/section-tabs"
 import type { User } from "@/lib/types"
+import { formatPoints } from "@/lib/utils"
 
 import mockUsersData from "@/lib/mocks/users.json"
 
@@ -211,7 +212,7 @@ export default function UsersAnalyticsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">{user.user}</TableCell>
-                  <TableCell>{user.points.toLocaleString()} pts</TableCell>
+                  <TableCell>{formatPoints(user.points)}</TableCell>
                   <TableCell>{user.salesQty}</TableCell>
                   <TableCell>{formatDate(user.lastActivity)}</TableCell>
                 </TableRow>

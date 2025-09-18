@@ -1,5 +1,6 @@
 "use client"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { formatPoints } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { User, Mail, Phone, Calendar, Award, Activity } from "lucide-react"
@@ -104,7 +105,7 @@ export function UserViewDrawer({ user, open, onOpenChange }: UserViewDrawerProps
               <div className="flex items-center gap-3">
                 <Award className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{user.points_total.toLocaleString()} points</p>
+                  <p className="font-medium">{formatPoints(user.points_total)}</p>
                   <p className="text-sm text-muted-foreground">Total des points accumulés</p>
                 </div>
               </div>

@@ -86,3 +86,36 @@ export interface PaginationParams {
   sort_by?: string
   sort_order?: "asc" | "desc"
 }
+
+// Authentication related types
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean
+  message?: string
+}
+
+export interface ResetPasswordRequest {
+  email: string
+  code: string  
+  newPassword: string
+}
+
+export interface ResetPasswordResponse {
+  success: boolean
+  message?: string
+}
+
+// Code verification types for new workflow (matching backend DTO)
+export interface VerifyOtpRequest {
+  email: string
+  code: string
+}
+
+export interface VerifyOtpResponse {
+  success: boolean
+  message?: string
+  resetToken?: string // Token temporaire pour l'étape suivante
+}

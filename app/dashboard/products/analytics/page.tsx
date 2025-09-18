@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Package, ShoppingCart, Award, TrendingUp, Download } from "lucide-react"
 import { SectionTabs } from "@/components/layout/section-tabs"
 import type { Product } from "@/lib/types"
+import { formatNumber } from "@/lib/utils"
 
 import mockProductsData from "@/lib/mocks/products.json"
 
@@ -134,7 +135,7 @@ export default function ProductsAnalyticsPage() {
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalPointsIssued.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatNumber(totalPointsIssued)}</div>
             <p className="text-xs text-muted-foreground">Points distributed</p>
           </CardContent>
         </Card>
@@ -172,7 +173,7 @@ export default function ProductsAnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
