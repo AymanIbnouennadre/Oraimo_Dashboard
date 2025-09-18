@@ -1,79 +1,76 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   /* Updated to Oraimo brand colors: green, white, black, gray */
-  --background: #ffffff; /* White background */
-  --foreground: #1f2937; /* Dark gray text */
-  --card: #ffffff; /* White cards */
-  --card-foreground: #1f2937; /* Dark gray text on cards */
-  --popover: #ffffff; /* White popovers */
-  --popover-foreground: #1f2937; /* Dark gray text on popovers */
-  --primary: #89ff13; /* Oraimo green primary */
-  --primary-foreground: #000000; /* Black text on green */
-  --secondary: #6b7280; /* Gray secondary */
-  --secondary-foreground: #ffffff; /* White text on gray */
-  --muted: #f9fafb; /* Light gray muted */
-  --muted-foreground: #6b7280; /* Gray muted text */
-  --accent: #89ff13; /* Oraimo green accent */
-  --accent-foreground: #000000; /* Black text on green accent */
-  --destructive: #dc2626; /* Red for errors */
-  --destructive-foreground: #ffffff; /* White text on red */
-  --border: #e5e7eb; /* Light gray borders */
-  --input: #f9fafb; /* Light gray input background */
-  --ring: #89ff13; /* Green focus ring */
-  --chart-1: #89ff13; /* Oraimo green for charts */
-  --chart-2: #1f2937; /* Dark gray for charts */
-  --chart-3: #6b7280; /* Medium gray for charts */
-  --chart-4: #9ca3af; /* Light gray for charts */
-  --chart-5: #d1d5db; /* Very light gray for charts */
-  --radius: 0.5rem; /* 8px border radius */
-  --sidebar: #f9fafb; /* Light gray sidebar */
-  --sidebar-foreground: #1f2937; /* Dark gray sidebar text */
-  --sidebar-primary: #ffffff; /* White sidebar primary */
-  --sidebar-primary-foreground: #1f2937; /* Dark gray text */
-  --sidebar-accent: #89ff13; /* Green sidebar accent */
-  --sidebar-accent-foreground: #000000; /* Black text on green */
-  --sidebar-border: #e5e7eb; /* Light gray sidebar border */
-  --sidebar-ring: #89ff13; /* Green focus ring for sidebar */
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+  --primary: #89ff13;
+  --primary-foreground: #000000;
+  --secondary: #6b7280;
+  --secondary-foreground: #ffffff;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --accent: #89ff13;
+  --accent-foreground: #000000;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #f9fafb;
+  --ring: #89ff13;
+  --chart-1: #89ff13;
+  --chart-2: #1f2937;
+  --chart-3: #6b7280;
+  --chart-4: #9ca3af;
+  --chart-5: #d1d5db;
+  --radius: 0.5rem;
+  --sidebar: #f9fafb;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #1f2937;
+  --sidebar-accent: #89ff13;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #89ff13;
 }
 
 .dark {
-  /* Dark mode with Oraimo colors */
-  --background: #111827; /* Dark background */
-  --foreground: #f9fafb; /* Light text */
-  --card: #1f2937; /* Dark gray cards */
-  --card-foreground: #f9fafb; /* Light text on cards */
-  --popover: #1f2937; /* Dark gray popovers */
-  --popover-foreground: #f9fafb; /* Light text on popovers */
-  --primary: #89ff13; /* Oraimo green primary */
-  --primary-foreground: #000000; /* Black text on green */
-  --secondary: #374151; /* Dark gray secondary */
-  --secondary-foreground: #f9fafb; /* Light text on dark gray */
-  --muted: #1f2937; /* Dark gray muted */
-  --muted-foreground: #9ca3af; /* Light gray muted text */
-  --accent: #89ff13; /* Oraimo green accent */
-  --accent-foreground: #000000; /* Black text on green accent */
-  --destructive: #dc2626; /* Red for errors */
-  --destructive-foreground: #ffffff; /* White text on red */
-  --border: #374151; /* Dark gray borders */
-  --input: #1f2937; /* Dark gray input background */
-  --ring: #89ff13; /* Green focus ring */
-  --chart-1: #89ff13; /* Oraimo green for charts */
-  --chart-2: #f9fafb; /* Light for charts */
-  --chart-3: #9ca3af; /* Medium gray for charts */
-  --chart-4: #6b7280; /* Darker gray for charts */
-  --chart-5: #374151; /* Dark gray for charts */
-  --sidebar: #1f2937; /* Dark gray sidebar */
-  --sidebar-foreground: #f9fafb; /* Light sidebar text */
-  --sidebar-primary: #111827; /* Darker sidebar primary */
-  --sidebar-primary-foreground: #f9fafb; /* Light text */
-  --sidebar-accent: #89ff13; /* Green sidebar accent */
-  --sidebar-accent-foreground: #000000; /* Black text on green */
-  --sidebar-border: #374151; /* Dark gray sidebar border */
-  --sidebar-ring: #89ff13; /* Green focus ring for sidebar */
+  --background: #111827;
+  --foreground: #f9fafb;
+  --card: #1f2937;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
+  --primary: #89ff13;
+  --primary-foreground: #000000;
+  --secondary: #374151;
+  --secondary-foreground: #f9fafb;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #89ff13;
+  --accent-foreground: #000000;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #374151;
+  --input: #374151;
+  --ring: #89ff13;
+  --chart-1: #89ff13;
+  --chart-2: #f9fafb;
+  --chart-3: #9ca3af;
+  --chart-4: #6b7280;
+  --chart-5: #374151;
+  --sidebar: #111827;
+  --sidebar-foreground: #f9fafb;
+  --sidebar-primary: #1f2937;
+  --sidebar-primary-foreground: #f9fafb;
+  --sidebar-accent: #89ff13;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #374151;
+  --sidebar-ring: #89ff13;
 }
 
 @theme inline {
@@ -120,11 +117,10 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
   body {
-    @apply bg-background text-foreground font-sans;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), system-ui, sans-serif;
   }
   h1,
   h2,
@@ -132,6 +128,31 @@
   h4,
   h5,
   h6 {
-    @apply font-heading;
+    font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
   }
+}
+
+/* Custom tier badge colors */
+.badge-gold {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
+.badge-silver {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.badge-bronze {
+  background-color: #d2b48c;
+  color: #92400e;
+}
+
+/* Custom spacing for user drawer */
+.user-drawer-content {
+  padding-left: 2rem;
+}
+
+.user-drawer-section {
+  margin-left: 0.5rem;
 }

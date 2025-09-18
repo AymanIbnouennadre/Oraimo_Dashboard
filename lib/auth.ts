@@ -22,16 +22,17 @@ export interface AuthResponse {
 export const mockAuth = {
   // Mock admin user for testing
   adminUser: {
-    id: "admin-1",
-    name: "Admin Oraimo",
+    id: 1,
+    firstName: "Admin",
+    lastName: "Oraimo",
     phone: "+33123456789",
     email: "admin@oraimo.com",
+    address: "Admin Address",
+    status: "APPROVED" as const,
+    storeTiers: "GOLD" as const,
     role: "ADMIN" as const,
-    tier: "GOLD" as const,
-    enabled: true,
-    points_total: 0,
-    last_activity: new Date().toISOString(),
-    created: "2023-01-01T00:00:00Z",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 
   // Simulate login
@@ -89,7 +90,7 @@ export const mockAuth = {
 
   // Check if user is admin and enabled
   isAuthorized(session: AuthSession | null): boolean {
-    return session?.user?.role === "ADMIN" && session?.user?.enabled === true
+        return session?.user?.role === "ADMIN" && session?.user?.status === "APPROVED"
   },
 }
 

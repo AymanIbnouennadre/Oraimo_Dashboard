@@ -11,7 +11,7 @@ import { SectionTabs } from "@/components/layout/section-tabs"
 import type { User } from "@/lib/types"
 import { formatPoints } from "@/lib/utils"
 
-import mockUsersData from "@/lib/mocks/users.json"
+
 
 // Mock analytics data
 const mockChartData = [
@@ -33,12 +33,13 @@ const mockTopUsers = [
 ]
 
 export default function UsersAnalyticsPage() {
-  const [users] = useState<User[]>(mockUsersData as User[])
+    // For now, we'll use empty data until we implement the analytics backend
+  const [users] = useState<User[]>([])
   const [period, setPeriod] = useState("7d")
 
   // Calculate KPIs
   const totalUsers = users.length
-  const enabledUsers = users.filter((u) => u.enabled).length
+  const enabledUsers = users.filter((u) => u.status === 'APPROVED').length
   const disabledUsers = totalUsers - enabledUsers
   const newUsers = Math.floor(totalUsers * 0.15) // Mock: 15% are new
   const activeUsers = Math.floor(totalUsers * 0.65) // Mock: 65% are active

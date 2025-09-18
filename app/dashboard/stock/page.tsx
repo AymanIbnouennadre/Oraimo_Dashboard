@@ -5,15 +5,13 @@ import { StockTable } from "@/components/stock/stock-table"
 import { StockFilters } from "@/components/stock/stock-filters"
 import type { StockMovement, Product, User } from "@/lib/types"
 
-// Mock data imports
-import stockData from "@/lib/mocks/stock.json"
-import productsData from "@/lib/mocks/products.json"
-import usersData from "@/lib/mocks/users.json"
+// TODO: Replace with actual API service when available
+// For now using empty arrays - implement stock service later
 
 export default function StockPage() {
-  const [movements, setMovements] = useState<StockMovement[]>(stockData as StockMovement[])
-  const [products] = useState<Product[]>(productsData as Product[])
-  const [users] = useState<User[]>(usersData as User[])
+  const [movements, setMovements] = useState<StockMovement[]>([])
+  const [products] = useState<Product[]>([])
+  const [users] = useState<User[]>([])
   const [filters, setFilters] = useState({
     search: "",
     type: "",
@@ -97,9 +95,11 @@ export default function StockPage() {
         <p className="text-lg text-muted-foreground">Track and manage inventory movements</p>
       </div>
 
-      <StockFilters onFiltersChange={setFilters} products={products} users={users} />
-
-      <StockTable movements={filteredMovements} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleAdd} />
+        <StockFilters 
+          onFiltersChange={setFilters} 
+          products={[]} 
+          users={[]} 
+        />      <StockTable movements={filteredMovements} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleAdd} />
     </div>
   )
 }

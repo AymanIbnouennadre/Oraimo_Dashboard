@@ -1,6 +1,77 @@
 // Core data types for Oraimo Admin
 
+// User Management Types (matching backend DTOs)
 export interface User {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: string
+  status: "APPROVED" | "DISABLED"
+  storeTiers: "GOLD" | "SILVER" | "BRONZE"
+  role: "ADMIN" | "CUSTOMER"
+  created?: string  // L'API renvoie 'created' pas 'createdAt'
+  updatedAt?: string
+}
+
+export interface CreateUserRequest {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: string
+  password: string
+  storeTiers: "GOLD" | "SILVER" | "BRONZE"
+  role: "ADMIN" | "CUSTOMER"
+}
+
+export interface UpdateUserRequest {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  address?: string
+  status?: "APPROVED" | "DISABLED"
+  storeTiers?: "GOLD" | "SILVER" | "BRONZE"
+  role?: "ADMIN" | "CUSTOMER"
+}
+
+export interface UserResponse {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  address: string
+  status: string
+  storeTiers: string
+  role: string
+  created?: string  // L'API renvoie 'created'
+  updatedAt?: string
+}
+
+export interface UserFilter {
+  search?: string
+  email?: string
+  phone?: string
+  status?: "APPROVED" | "DISABLED"
+  storeTiers?: "GOLD" | "SILVER" | "BRONZE"
+  role?: "ADMIN" | "CUSTOMER"
+}
+
+export interface PaginatedResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  first: boolean
+  last: boolean
+}
+
+// Legacy User type (to be removed gradually)
+export interface LegacyUser {
   id: string
   name: string
   phone: string

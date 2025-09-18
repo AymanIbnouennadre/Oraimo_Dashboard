@@ -3,6 +3,7 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -176,12 +177,18 @@ export default function LoginPage() {
       <LoadingOverlay show={isLoading} label="Signing in…" />
 
       <Card className="w-full max-w-md shadow-xl border-0 bg-card/80 backdrop-blur">
-        <CardHeader className="text-center space-y-4 pb-8">
-          <div className="mx-auto mb-2 h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
-            <span className="text-primary-foreground font-heading font-bold text-2xl">O</span>
+        <CardHeader className="text-center space-y-6 pb-8">
+          <div className="mx-auto mb-6 flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Oraimo Logo"
+              width={200}
+              height={200}
+              className="object-contain"
+              priority
+            />
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-3xl font-heading font-bold text-foreground">Oraimo Admin</CardTitle>
             <CardDescription className="text-muted-foreground">Sign in to your admin dashboard</CardDescription>
           </div>
         </CardHeader>

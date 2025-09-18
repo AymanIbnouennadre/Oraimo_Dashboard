@@ -15,10 +15,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Eye, Edit, RotateCcw, Trash2, MoreHorizontal } from "lucide-react"
+import { Eye, Edit, MoreHorizontal } from "lucide-react"
 import type { User } from "@/lib/types"
 import { UserViewDrawer } from "./user-view-drawer"
 
@@ -27,10 +26,8 @@ interface UsersTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
-  onToggleEnabled: (userId: string, enabled: boolean) => void
+  onToggleStatus: (userId: number, currentStatus: string) => void
   onEdit: (user: User) => void
-  onResetPassword: (userId: string) => void
-  onDelete: (userId: string) => void
 }
 
 export function UsersTable({
@@ -38,10 +35,8 @@ export function UsersTable({
   currentPage,
   totalPages,
   onPageChange,
-  onToggleEnabled,
+  onToggleStatus,
   onEdit,
-  onResetPassword,
-  onDelete,
 }: UsersTableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false)
@@ -52,12 +47,12 @@ export function UsersTable({
   }
 
   const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
+    new Date(dateString).toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" })
 
   const getTierBadgeVariant = (tier: string) => {
     switch (tier) {
       case "GOLD":
-        return "default"
+        return "default" // Or you could create custom classes for gold color
       case "SILVER":
         return "secondary"
       case "BRONZE":
@@ -68,46 +63,72 @@ export function UsersTable({
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Téléphone</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead>Niveau</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Créé le</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
+              <TableHead className="text-center">Name</TableHead>
+              <TableHead className="text-center">Phone</TableHead>
+              <TableHead className="text-center">Email</TableHead>
+              <TableHead className="text-center">Role</TableHead>
+              <TableHead className="text-center">Tier</TableHead>
+              <TableHead className="text-center">Status</TableHead>
+              <TableHead className="text-center w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.phone}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>{user.role}</Badge>
+                <TableCell className="font-medium text-center">{user.firstName} {user.lastName}</TableCell>
+                <TableCell className="text-center">{user.phone}</TableCell>
+                <TableCell className="text-center">{user.email}</TableCell>
+                <TableCell className="text-center">
+                  <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} 
+                         className={user.role === "ADMIN" ? "text-gray-800 hover:opacity-80" : "text-white hover:opacity-80"}
+                         style={{
+                           backgroundColor: user.role === "ADMIN" ? "#BBDCE5" : "#9B7EBD"
+                         }}>
+                    {user.role}
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  <Badge variant={getTierBadgeVariant(user.tier)}>{user.tier}</Badge>
+                <TableCell className="text-center">
+                  <Badge 
+                    variant={getTierBadgeVariant(user.storeTiers)}
+                    className={
+                      user.storeTiers === 'GOLD' ? 'badge-gold' :
+                      user.storeTiers === 'SILVER' ? 'badge-silver' :
+                      user.storeTiers === 'BRONZE' ? 'badge-bronze' : ''
+                    }
+                  >
+                    {user.storeTiers}
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-3">
                     <Switch
-                      checked={user.enabled}
-                      onCheckedChange={(checked) => onToggleEnabled(user.id, checked)}
-                      size="sm"
+                      checked={user.status === 'APPROVED'}
+                      onCheckedChange={() => onToggleStatus(user.id, user.status)}
+                      className={`${
+                        user.status === 'APPROVED' 
+                          ? '!bg-green-500 data-[state=checked]:!bg-green-500 [&>span]:!bg-white' 
+                          : '!bg-red-600 data-[state=unchecked]:!bg-red-600 [&>span]:!bg-white'
+                      }`}
                     />
-                    <span className="text-sm">{user.enabled ? "Activé" : "Désactivé"}</span>
+                    <Badge 
+                      variant={user.status === 'APPROVED' ? 'default' : 'destructive'}
+                      className={`${
+                        user.status === 'APPROVED' 
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                          : 'bg-red-600 text-white hover:bg-red-700'
+                      } border-none`}
+                    >
+                      {user.status === 'APPROVED' ? "Enabled" : "Disabled"}
+                    </Badge>
                   </div>
                 </TableCell>
-                <TableCell>{formatDate(user.created)}</TableCell>
 
                 {/* Actions (3 points) */}
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                   <DropdownMenu>
                     {/* ✅ pas de asChild : bouton natif => ref OK */}
                     <DropdownMenuTrigger
@@ -121,23 +142,11 @@ export function UsersTable({
                     <DropdownMenuContent align="end" className="w-56 z-50">
                       <DropdownMenuItem onClick={() => handleViewUser(user)}>
                         <Eye className="h-4 w-4 mr-2" />
-                        Voir
+                        View
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onEdit(user)}>
                         <Edit className="h-4 w-4 mr-2" />
-                        Modifier
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onResetPassword(user.id)}>
-                        <RotateCcw className="h-4 w-4 mr-2" />
-                        Réinitialiser mot de passe
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onDelete(user.id)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Supprimer
+                        Edit
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

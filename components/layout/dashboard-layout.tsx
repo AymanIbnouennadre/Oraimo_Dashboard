@@ -1,8 +1,9 @@
 // components/layouts/dashboard-layout.tsx (ou l'emplacement actuel)
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import {
   Sidebar,
   SidebarContent,
@@ -29,32 +30,27 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Home, Users, Package, Warehouse, Brain, Settings, LogOut, User, ChevronRight } from "lucide-react"
 import { useAuth } from "@/components/auth/auth-provider"
+import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import Link from "next/link"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-/** Overlay plein écran réutilisable */
-function LoadingOverlay({ show, label = "Processing..." }: { show: boolean; label?: string }) {
-  if (!show) return null
-  return (
-    <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm flex items-center justify-center">
-      <div className="flex items-center gap-3 rounded-xl bg-card/95 px-4 py-3 shadow-2xl">
-        <span
-          aria-hidden
-          className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"
-        />
-        <span className="text-sm font-medium text-foreground">{label}</span>
-      </div>
-    </div>
-  )
-}
-
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { session, logout } = useAuth()
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Attendre l'hydratation côté client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null // ou un loader
+  }
 
   const navigationItems = [
     {
@@ -109,15 +105,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex min-h-screen w-full bg-background">
         {/* Main Sidebar */}
         <Sidebar className="border-r border-border">
-          <SidebarHeader className="border-b border-border bg-card">
-            <div className="flex items-center gap-3 px-4 py-4">
-              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-                <span className="text-primary-foreground font-bold text-xl">O</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-heading font-bold text-lg text-foreground">Oraimo Admin</span>
-                <span className="text-sm text-muted-foreground">Dashboard</span>
-              </div>
+                    <SidebarHeader className="border-b border-border bg-card">
+            <div className="flex items-center justify-center px-4 py-8">
+              <Image
+                src="/logo.png"
+                alt="Oraimo Logo"
+                width={120}
+                height={120}
+                className="object-contain"
+                priority
+              />
             </div>
           </SidebarHeader>
 
@@ -126,7 +123,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title} className="mb-1">
                   {item.items ? (
-                    <Collapsible defaultOpen={item.isActive}>
+                    <Collapsible key={`${item.title}-${item.isActive}`} defaultOpen={item.isActive}>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="h-11 rounded-lg font-medium transition-all hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground">
                           <item.icon className="h-5 w-5" />
@@ -181,12 +178,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="text-sm bg-primary text-primary-foreground">
-                          {session?.user?.name?.charAt(0) || "A"}
+                          {session?.user?.role?.charAt(0) || "A"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col items-start text-left flex-1">
-                        <span className="text-sm font-medium text-foreground">{session?.user?.name}</span>
-                        <span className="text-xs text-muted-foreground">{session?.user?.phone}</span>
+                        <span className="text-sm font-medium text-foreground">Admin User</span>
+                        <span className="text-xs text-muted-foreground">{session?.user?.role}</span>
                       </div>
                     </button>
                   </DropdownMenuTrigger>

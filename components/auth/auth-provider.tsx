@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 
-type AuthSession = { user: { role: string | null } } | null
+type AuthSession = { user: { role: string | null; userId?: string | number } } | null
 type Ctx = { session: AuthSession; isLoading: boolean; logout: () => void }
 const AuthContext = createContext<Ctx>({ session: null, isLoading: true, logout: () => {} })
 
@@ -63,7 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const role = extractRole(payload)
-    setSession({ user: { role } })
+    const userId = payload?.sub || payload?.userId || payload?.id || null
+    setSession({ user: { role, userId } })
     setIsLoading(false)
 
     const isAuthPage = pathname === "/login" || pathname === "/forgot-password"
