@@ -22,16 +22,17 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
-    sku: "",
+    classLabel: "",
     model: "",
-    marketing_name: "",
+    marketingName: "",
     category: "",
-    retail_price: "",
-    final_price: "",
-    points_gold: "",
-    points_silver: "",
-    points_bronze: "",
-    image_url: "",
+    retailPrice: "",
+    finalCustomerPrice: "",
+    pointsGold: "",
+    pointsSilver: "",
+    pointsBronze: "",
+    image: "",
+    seuil: "",
   })
 
   // Reset form when dialog opens/closes or product changes
@@ -40,30 +41,32 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
       if (product) {
         // Edit mode
         setFormData({
-          sku: product.sku,
+          classLabel: product.classLabel,
           model: product.model,
-          marketing_name: product.marketing_name,
+          marketingName: product.marketingName,
           category: product.category,
-          retail_price: product.retail_price.toString(),
-          final_price: product.final_price.toString(),
-          points_gold: product.points_gold.toString(),
-          points_silver: product.points_silver.toString(),
-          points_bronze: product.points_bronze.toString(),
-          image_url: product.image_url || "",
+          retailPrice: product.retailPrice.toString(),
+          finalCustomerPrice: product.finalCustomerPrice.toString(),
+          pointsGold: product.pointsGold.toString(),
+          pointsSilver: product.pointsSilver.toString(),
+          pointsBronze: product.pointsBronze.toString(),
+          image: product.image || "",
+          seuil: product.seuil.toString(),
         })
       } else {
         // Create mode
         setFormData({
-          sku: "",
+          classLabel: "",
           model: "",
-          marketing_name: "",
+          marketingName: "",
           category: "",
-          retail_price: "",
-          final_price: "",
-          points_gold: "",
-          points_silver: "",
-          points_bronze: "",
-          image_url: "",
+          retailPrice: "",
+          finalCustomerPrice: "",
+          pointsGold: "",
+          pointsSilver: "",
+          pointsBronze: "",
+          image: "",
+          seuil: "",
         })
       }
       setError("")
@@ -71,22 +74,24 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
   }, [open, product])
 
   const validateForm = () => {
-    if (!formData.sku.trim()) return "Le SKU est requis"
-    if (!formData.model.trim()) return "Le modèle est requis"
-    if (!formData.marketing_name.trim()) return "Le nom marketing est requis"
-    if (!formData.category) return "La catégorie est requise"
+    if (!formData.classLabel.trim()) return "Class Label is required"
+    if (!formData.model.trim()) return "Model is required"
+    if (!formData.marketingName.trim()) return "Marketing name is required"
+    if (!formData.category) return "Category is required"
 
-    const retailPrice = Number.parseFloat(formData.retail_price)
-    const finalPrice = Number.parseFloat(formData.final_price)
-    const pointsGold = Number.parseInt(formData.points_gold)
-    const pointsSilver = Number.parseInt(formData.points_silver)
-    const pointsBronze = Number.parseInt(formData.points_bronze)
+    const retailPrice = Number.parseFloat(formData.retailPrice)
+    const finalPrice = Number.parseFloat(formData.finalCustomerPrice)
+    const pointsGold = Number.parseInt(formData.pointsGold)
+    const pointsSilver = Number.parseInt(formData.pointsSilver)
+    const pointsBronze = Number.parseInt(formData.pointsBronze)
+    const seuil = Number.parseInt(formData.seuil)
 
-    if (isNaN(retailPrice) || retailPrice < 0) return "Le prix conseillé doit être un nombre positif"
-    if (isNaN(finalPrice) || finalPrice < 0) return "Le prix de vente doit être un nombre positif"
-    if (isNaN(pointsGold) || pointsGold < 0) return "Les points Gold doivent être un nombre positif"
-    if (isNaN(pointsSilver) || pointsSilver < 0) return "Les points Silver doivent être un nombre positif"
-    if (isNaN(pointsBronze) || pointsBronze < 0) return "Les points Bronze doivent être un nombre positif"
+    if (isNaN(retailPrice) || retailPrice < 0) return "Retail price must be a positive number"
+    if (isNaN(finalPrice) || finalPrice < 0) return "Selling price must be a positive number"
+    if (isNaN(pointsGold) || pointsGold < 0) return "Gold points must be a positive number"
+    if (isNaN(pointsSilver) || pointsSilver < 0) return "Silver points must be a positive number"
+    if (isNaN(pointsBronze) || pointsBronze < 0) return "Bronze points must be a positive number"
+    if (isNaN(seuil) || seuil < 0) return "Threshold must be a positive number"
 
     return null
   }
@@ -105,16 +110,17 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
     try {
       const productData: Partial<Product> = {
-        sku: formData.sku.trim(),
+        classLabel: formData.classLabel.trim(),
         model: formData.model.trim(),
-        marketing_name: formData.marketing_name.trim(),
+        marketingName: formData.marketingName.trim(),
         category: formData.category,
-        retail_price: Number.parseFloat(formData.retail_price),
-        final_price: Number.parseFloat(formData.final_price),
-        points_gold: Number.parseInt(formData.points_gold),
-        points_silver: Number.parseInt(formData.points_silver),
-        points_bronze: Number.parseInt(formData.points_bronze),
-        image_url: formData.image_url.trim() || undefined,
+        retailPrice: Number.parseFloat(formData.retailPrice),
+        finalCustomerPrice: Number.parseFloat(formData.finalCustomerPrice),
+        pointsGold: Number.parseInt(formData.pointsGold),
+        pointsSilver: Number.parseInt(formData.pointsSilver),
+        pointsBronze: Number.parseInt(formData.pointsBronze),
+        image: formData.image.trim() || undefined,
+        seuil: Number.parseInt(formData.seuil),
       }
 
       if (product) {
@@ -124,7 +130,7 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
       await onSave(productData)
       onOpenChange(false)
     } catch (err) {
-      setError("Une erreur est survenue lors de la sauvegarde")
+      setError("An error occurred while saving")
     } finally {
       setIsLoading(false)
     }
@@ -138,9 +144,9 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{product ? "Modifier le produit" : "Nouveau produit"}</DialogTitle>
+          <DialogTitle>{product ? "Edit Product" : "New Product"}</DialogTitle>
           <DialogDescription>
-            {product ? "Modifiez les informations du produit" : "Créez un nouveau produit dans le catalogue"}
+            {product ? "Edit product information" : "Create a new product in the catalog"}
           </DialogDescription>
         </DialogHeader>
 
@@ -153,18 +159,18 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU *</Label>
+              <Label htmlFor="classLabel">Class Label *</Label>
               <Input
-                id="sku"
-                value={formData.sku}
-                onChange={(e) => updateField("sku", e.target.value)}
+                id="classLabel"
+                value={formData.classLabel}
+                onChange={(e) => updateField("classLabel", e.target.value)}
                 placeholder="ORA-XXX-001"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model">Modèle *</Label>
+              <Label htmlFor="model">Model *</Label>
               <Input
                 id="model"
                 value={formData.model}
@@ -176,26 +182,26 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="marketing_name">Nom marketing *</Label>
+            <Label htmlFor="marketingName">Marketing Name *</Label>
             <Input
-              id="marketing_name"
-              value={formData.marketing_name}
-              onChange={(e) => updateField("marketing_name", e.target.value)}
-              placeholder="Oraimo FreePods 3 - Écouteurs Sans Fil"
+              id="marketingName"
+              value={formData.marketingName}
+              onChange={(e) => updateField("marketingName", e.target.value)}
+              placeholder="Oraimo FreePods 3 - Wireless Earbuds"
               disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Catégorie *</Label>
+            <Label htmlFor="category">Category *</Label>
             <Select value={formData.category} onValueChange={(value) => updateField("category", value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionner une catégorie" />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Audio">Audio</SelectItem>
-                <SelectItem value="Chargeurs">Chargeurs</SelectItem>
-                <SelectItem value="Accessoires">Accessoires</SelectItem>
+                <SelectItem value="Chargeurs">Chargers</SelectItem>
+                <SelectItem value="Accessoires">Accessories</SelectItem>
                 <SelectItem value="Wearables">Wearables</SelectItem>
               </SelectContent>
             </Select>
@@ -203,28 +209,28 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="retail_price">Prix conseillé (€) *</Label>
+              <Label htmlFor="retailPrice">Retail Price (MAD) *</Label>
               <Input
-                id="retail_price"
+                id="retailPrice"
                 type="number"
                 min="0"
                 step="0.01"
-                value={formData.retail_price}
-                onChange={(e) => updateField("retail_price", e.target.value)}
+                value={formData.retailPrice}
+                onChange={(e) => updateField("retailPrice", e.target.value)}
                 placeholder="79.99"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="final_price">Prix de vente (€) *</Label>
+              <Label htmlFor="finalCustomerPrice">Selling Price (MAD) *</Label>
               <Input
-                id="final_price"
+                id="finalCustomerPrice"
                 type="number"
                 min="0"
                 step="0.01"
-                value={formData.final_price}
-                onChange={(e) => updateField("final_price", e.target.value)}
+                value={formData.finalCustomerPrice}
+                onChange={(e) => updateField("finalCustomerPrice", e.target.value)}
                 placeholder="59.99"
                 disabled={isLoading}
               />
@@ -233,39 +239,39 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="points_gold">Points Gold *</Label>
+              <Label htmlFor="pointsGold">Points Gold *</Label>
               <Input
-                id="points_gold"
+                id="pointsGold"
                 type="number"
                 min="0"
-                value={formData.points_gold}
-                onChange={(e) => updateField("points_gold", e.target.value)}
+                value={formData.pointsGold}
+                onChange={(e) => updateField("pointsGold", e.target.value)}
                 placeholder="120"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="points_silver">Points Silver *</Label>
+              <Label htmlFor="pointsSilver">Points Silver *</Label>
               <Input
-                id="points_silver"
+                id="pointsSilver"
                 type="number"
                 min="0"
-                value={formData.points_silver}
-                onChange={(e) => updateField("points_silver", e.target.value)}
+                value={formData.pointsSilver}
+                onChange={(e) => updateField("pointsSilver", e.target.value)}
                 placeholder="100"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="points_bronze">Points Bronze *</Label>
+              <Label htmlFor="pointsBronze">Points Bronze *</Label>
               <Input
-                id="points_bronze"
+                id="pointsBronze"
                 type="number"
                 min="0"
-                value={formData.points_bronze}
-                onChange={(e) => updateField("points_bronze", e.target.value)}
+                value={formData.pointsBronze}
+                onChange={(e) => updateField("pointsBronze", e.target.value)}
                 placeholder="80"
                 disabled={isLoading}
               />
@@ -273,24 +279,38 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image_url">URL de l'image</Label>
+            <Label htmlFor="seuil">Seuil *</Label>
             <Input
-              id="image_url"
-              type="url"
-              value={formData.image_url}
-              onChange={(e) => updateField("image_url", e.target.value)}
-              placeholder="https://example.com/image.jpg"
+              id="seuil"
+              type="number"
+              min="0"
+              value={formData.seuil}
+              onChange={(e) => updateField("seuil", e.target.value)}
+              placeholder="10"
               disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image">Image URL {!product && "*"}</Label>
+            <Input
+              id="image"
+              type="text"
+              value={formData.image}
+              onChange={(e) => updateField("image", e.target.value)}
+              placeholder="https://example.com/image.jpg (optionnel)"
+              disabled={isLoading}
+              required={!product && !formData.image}
             />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-              Annuler
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {product ? "Modifier" : "Créer"}
+              {product ? "Update" : "Create"}
             </Button>
           </div>
         </form>

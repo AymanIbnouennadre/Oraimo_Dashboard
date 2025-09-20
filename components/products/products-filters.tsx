@@ -5,16 +5,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Filter, X } from "lucide-react"
-import type { FilterOptions } from "@/lib/types"
+import type { ProductFilter } from "@/lib/types"
 
 interface ProductsFiltersProps {
-  filters: FilterOptions
-  onFiltersChange: (filters: FilterOptions) => void
+  filters: ProductFilter
+  onFiltersChange: (filters: ProductFilter) => void
   onReset: () => void
 }
 
 export function ProductsFilters({ filters, onFiltersChange, onReset }: ProductsFiltersProps) {
-  const updateFilter = (key: keyof FilterOptions, value: any) => {
+  const updateFilter = (key: keyof ProductFilter, value: any) => {
     onFiltersChange({ ...filters, [key]: value })
   }
 
@@ -25,19 +25,19 @@ export function ProductsFilters({ filters, onFiltersChange, onReset }: ProductsF
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Filter className="h-5 w-5" />
-          Filtres
+          Filters
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {/* Search */}
           <div className="space-y-2">
-            <Label htmlFor="search">Recherche</Label>
+            <Label htmlFor="search">Search</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search"
-                placeholder="Nom, modèle, SKU..."
+                placeholder="Name, model, class label..."
                 value={filters.search || ""}
                 onChange={(e) => updateFilter("search", e.target.value)}
                 className="pl-10"
@@ -47,19 +47,19 @@ export function ProductsFilters({ filters, onFiltersChange, onReset }: ProductsF
 
           {/* Category Filter */}
           <div className="space-y-2">
-            <Label>Catégorie</Label>
+            <Label>Category</Label>
             <Select
               value={filters.category || "all"}
               onValueChange={(value) => updateFilter("category", value === "all" ? undefined : value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Toutes les catégories" />
+                <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Toutes les catégories</SelectItem>
+                <SelectItem value="all">All categories</SelectItem>
                 <SelectItem value="Audio">Audio</SelectItem>
-                <SelectItem value="Chargeurs">Chargeurs</SelectItem>
-                <SelectItem value="Accessoires">Accessoires</SelectItem>
+                <SelectItem value="Chargeurs">Chargers</SelectItem>
+                <SelectItem value="Accessoires">Accessories</SelectItem>
                 <SelectItem value="Wearables">Wearables</SelectItem>
               </SelectContent>
             </Select>
@@ -67,32 +67,32 @@ export function ProductsFilters({ filters, onFiltersChange, onReset }: ProductsF
 
           {/* Min Price */}
           <div className="space-y-2">
-            <Label htmlFor="min_price">Prix minimum (€)</Label>
+            <Label htmlFor="minPrice">Min Price (MAD)</Label>
             <Input
-              id="min_price"
+              id="minPrice"
               type="number"
               placeholder="0"
               min="0"
               step="0.01"
-              value={filters.min_price || ""}
+              value={filters.minPrice || ""}
               onChange={(e) =>
-                updateFilter("min_price", e.target.value ? Number.parseFloat(e.target.value) : undefined)
+                updateFilter("minPrice", e.target.value ? Number.parseFloat(e.target.value) : undefined)
               }
             />
           </div>
 
           {/* Max Price */}
           <div className="space-y-2">
-            <Label htmlFor="max_price">Prix maximum (€)</Label>
+            <Label htmlFor="maxPrice">Max Price (MAD)</Label>
             <Input
-              id="max_price"
+              id="maxPrice"
               type="number"
               placeholder="1000"
               min="0"
               step="0.01"
-              value={filters.max_price || ""}
+              value={filters.maxPrice || ""}
               onChange={(e) =>
-                updateFilter("max_price", e.target.value ? Number.parseFloat(e.target.value) : undefined)
+                updateFilter("maxPrice", e.target.value ? Number.parseFloat(e.target.value) : undefined)
               }
             />
           </div>
@@ -102,7 +102,7 @@ export function ProductsFilters({ filters, onFiltersChange, onReset }: ProductsF
             {hasActiveFilters && (
               <Button variant="outline" onClick={onReset} size="sm" className="w-full bg-transparent">
                 <X className="h-4 w-4 mr-2" />
-                Réinitialiser
+                Reset
               </Button>
             )}
           </div>

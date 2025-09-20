@@ -40,7 +40,8 @@ async function apiRequest<T>(
     throw new Error(`API Error ${response.status}: ${errorText}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  return data
 }
 
 export const userService = {
@@ -56,10 +57,16 @@ export const userService = {
 
   // 3. Create new user
   async create(userData: CreateUserRequest): Promise<UserResponse> {
-    return apiRequest<UserResponse>("/api/users", {
+    // Log the data being sent to match your API format
+    console.log("Creating user with data:", JSON.stringify(userData, null, 2))
+    
+    const response = await apiRequest<UserResponse>("/api/users", {
       method: "POST",
       body: JSON.stringify(userData),
     })
+    
+    console.log("User creation response:", JSON.stringify(response, null, 2))
+    return response
   },
 
   // 4. Update user
@@ -85,10 +92,9 @@ export const userService = {
     filters: UserFilter = {},
     page: number = 0,
     size: number = 20,
-    sort: string = "created,desc"
+    sort: string = "createdAt,desc"
   ): Promise<PaginatedResponse<UserResponse>> {
     try {
-      // Try the dedicated search endpoint first
       const params = new URLSearchParams()
       params.append("page", page.toString())
       params.append("size", size.toString())
@@ -101,46 +107,62 @@ export const userService = {
       })
 
       const searchUrl = `/api/users/search?${params.toString()}`
+      
       return await apiRequest<PaginatedResponse<UserResponse>>(searchUrl)
     } catch (error) {
       // Fallback: get all users and filter client-side
-      const allUsers = await this.getAll()
-      
-      // Apply client-side filtering
-      let filteredUsers = allUsers
-      
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase()
-        filteredUsers = filteredUsers.filter(user => 
-          user.firstName?.toLowerCase().includes(searchTerm) ||
-          user.lastName?.toLowerCase().includes(searchTerm) ||
-          user.email?.toLowerCase().includes(searchTerm) ||
-          user.phone?.toLowerCase().includes(searchTerm)
-        )
-      }
-      
-      if (filters.role) {
-        filteredUsers = filteredUsers.filter(user => user.role === filters.role)
-      }
-      
-      if (filters.status) {
-        filteredUsers = filteredUsers.filter(user => user.status === filters.status)
-      }
-      
-      if (filters.storeTiers) {
-        filteredUsers = filteredUsers.filter(user => user.storeTiers === filters.storeTiers)
-      }
-      
-      // Pour le fallback côté client, on retourne TOUS les utilisateurs filtrés
-      // La pagination sera gérée côté frontend
-      return {
-        content: filteredUsers, // Tous les utilisateurs, pas de pagination ici
-        totalElements: filteredUsers.length,
-        totalPages: 1, // Une seule "page" car on retourne tout
-        size: filteredUsers.length,
-        number: 0,
-        first: true,
-        last: true
+      try {
+        const allUsersResponse = await apiRequest<any>('/api/users')
+        
+        // Handle different response structures
+        let allUsers: UserResponse[] = []
+        if (Array.isArray(allUsersResponse)) {
+          allUsers = allUsersResponse
+        } else if (allUsersResponse && Array.isArray(allUsersResponse.content)) {
+          allUsers = allUsersResponse.content
+        } else if (allUsersResponse && Array.isArray(allUsersResponse.users)) {
+          allUsers = allUsersResponse.users
+        } else {
+          throw new Error('No valid user data found in API response')
+        }
+        
+        // Apply client-side filtering
+        let filteredUsers = allUsers
+        
+        if (filters.search) {
+          const searchTerm = filters.search.toLowerCase()
+          filteredUsers = filteredUsers.filter(user => 
+            user.firstName?.toLowerCase().includes(searchTerm) ||
+            user.lastName?.toLowerCase().includes(searchTerm) ||
+            user.email?.toLowerCase().includes(searchTerm) ||
+            user.phone?.toLowerCase().includes(searchTerm)
+          )
+        }
+        
+        if (filters.role) {
+          filteredUsers = filteredUsers.filter(user => user.role === filters.role)
+        }
+        
+        if (filters.status) {
+          filteredUsers = filteredUsers.filter(user => user.status === filters.status)
+        }
+        
+        if (filters.storeTiers) {
+          filteredUsers = filteredUsers.filter(user => user.storeTiers === filters.storeTiers)
+        }
+        
+        // Return all filtered users (client-side pagination)
+        return {
+          content: filteredUsers,
+          totalElements: filteredUsers.length,
+          totalPages: 1,
+          size: filteredUsers.length,
+          number: 0,
+          first: true,
+          last: true
+        }
+      } catch (fallbackError) {
+        throw new Error('Unable to load users from API')
       }
     }
   },

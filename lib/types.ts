@@ -21,9 +21,8 @@ export interface CreateUserRequest {
   email: string
   phone: string
   address: string
-  password: string
-  storeTiers: "GOLD" | "SILVER" | "BRONZE"
-  role: "ADMIN" | "CUSTOMER"
+  role?: "ADMIN" | "CUSTOMER"  // Optional, defaults to CUSTOMER on server
+  storeTiers: "GOLD" | "SILVER" | "BRONZE"  // API expects uppercase format
 }
 
 export interface UpdateUserRequest {
@@ -84,7 +83,63 @@ export interface LegacyUser {
   created: string
 }
 
+// Product Management Types (matching backend API)
 export interface Product {
+  id: number
+  classLabel: string
+  model: string
+  marketingName: string
+  category: string
+  retailPrice: number
+  finalCustomerPrice: number
+  image: string
+  seuil: number
+  pointsGold: number
+  pointsSilver: number
+  pointsBronze: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface CreateProductRequest {
+  classLabel: string
+  model: string
+  marketingName: string
+  category: string
+  retailPrice: number
+  finalCustomerPrice: number
+  image?: string
+  seuil: number
+  pointsGold: number
+  pointsSilver: number
+  pointsBronze: number
+}
+
+export interface UpdateProductRequest {
+  classLabel?: string
+  model?: string
+  marketingName?: string
+  category?: string
+  retailPrice?: number
+  finalCustomerPrice?: number
+  image?: string
+  seuil?: number
+  pointsGold?: number
+  pointsSilver?: number
+  pointsBronze?: number
+}
+
+export interface ProductFilter {
+  search?: string
+  category?: string
+  minPrice?: number
+  maxPrice?: number
+  minSeuil?: number
+  maxSeuil?: number
+}
+
+// Legacy Product type (to be removed gradually)
+export interface LegacyProduct {
   id: string
   sku: string
   model: string

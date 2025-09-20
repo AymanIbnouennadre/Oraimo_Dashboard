@@ -1,67 +1,73 @@
 "use client"
-import { useState, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Package, Grid3X3 } from "lucide-react"
+import { Plus, Package, Grid3X3, AlertCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { SectionTabs } from "@/components/layout/section-tabs"
 import { ProductsGrid } from "@/components/products/products-grid"
 import { ProductsFilters } from "@/components/products/products-filters"
 import { ProductFormDialog } from "@/components/products/product-form-dialog"
-import type { Product, FilterOptions } from "@/lib/types"
-
-import mockProductsData from "@/lib/mocks/products.json"
+import { ProductViewDrawer } from "@/components/products/product-view-drawer"
+import { ProductDeleteDialog } from "@/components/products/product-delete-dialog"
+import { LoadingOverlay } from "@/components/ui/loading-overlay"
+import type { Product, ProductFilter } from "@/lib/types"
+import { productService } from "@/lib/services/product-service"
 
 const ITEMS_PER_PAGE = 12
 
 export default function ProductsManagementPage() {
-  const [products, setProducts] = useState<Product[]>(mockProductsData as Product[])
-  const [filters, setFilters] = useState<FilterOptions>({})
+  const [products, setProducts] = useState<Product[]>([])
+  const [filters, setFilters] = useState<ProductFilter>({})
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
+  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
-  // Filter and paginate products
-  const filteredProducts = useMemo(() => {
-    let filtered = [...products]
-
-    // Apply search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      filtered = filtered.filter(
-        (product) =>
-          product.marketing_name.toLowerCase().includes(searchLower) ||
-          product.model.toLowerCase().includes(searchLower) ||
-          product.sku.toLowerCase().includes(searchLower),
+  // Load products from API
+  const loadProducts = async () => {
+    try {
+      setError(null)
+      const result = await productService.filter(
+        filters,
+        currentPage - 1,
+        ITEMS_PER_PAGE,
       )
+      
+      setProducts(result.content)
+      setTotalCount(result.totalElements)
+      setTotalPages(result.totalPages)
+    } catch (err) {
+      console.error('Error loading products:', err)
+      setError('Error loading products')
+      setProducts([])
+      setTotalCount(0)
+      setTotalPages(0)
     }
+  }
 
-    // Apply category filter
-    if (filters.category) {
-      filtered = filtered.filter((product) => product.category === filters.category)
+  // Load products on component mount 
+  useEffect(() => {
+    setIsLoading(true)
+    loadProducts().finally(() => setIsLoading(false))
+  }, [])
+
+  // Load products when filters/page change without loading spinner
+  useEffect(() => {
+    if (currentPage > 1 || Object.keys(filters).length > 0) {
+      loadProducts()
     }
+  }, [filters, currentPage])
 
-    // Apply price filters
-    if (filters.min_price !== undefined) {
-      filtered = filtered.filter((product) => product.final_price >= filters.min_price!)
-    }
-
-    if (filters.max_price !== undefined) {
-      filtered = filtered.filter((product) => product.final_price <= filters.max_price!)
-    }
-
-    return filtered
-  }, [products, filters])
-
-  // Paginate filtered results
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-  }, [filteredProducts, currentPage])
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
-
-  // Handlers - all static now
-  const handleFiltersChange = (newFilters: FilterOptions) => {
+  // Handlers
+  const handleFiltersChange = (newFilters: ProductFilter) => {
     setFilters(newFilters)
     setCurrentPage(1)
   }
@@ -76,49 +82,81 @@ export default function ProductsManagementPage() {
     setIsFormDialogOpen(true)
   }
 
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product)
+    setIsViewDrawerOpen(true)
+  }
+
   const handleEditProduct = (product: Product) => {
     setSelectedProduct(product)
     setIsFormDialogOpen(true)
   }
 
-  const handleSaveProduct = (productData: Partial<Product>) => {
-    if (selectedProduct) {
-      // Update existing product
-      setProducts((prev) => prev.map((p) => (p.id === selectedProduct.id ? { ...p, ...productData } : p)))
-    } else {
-      // Create new product
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        ...productData,
-        created: new Date().toISOString(),
-      } as Product
-
-      setProducts((prev) => [newProduct, ...prev])
+  const handleDeleteProduct = (productId: number) => {
+    const product = products.find(p => p.id === productId)
+    if (product) {
+      setProductToDelete(product)
+      setIsDeleteDialogOpen(true)
     }
   }
 
-  const handleDeleteProduct = (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) {
-      return
+  const handleConfirmDelete = async (productId: number) => {
+    try {
+      setIsDeleting(true)
+      await productService.delete(productId)
+      await loadProducts()
+      setProductToDelete(null)
+    } catch (err) {
+      console.error('Error deleting product:', err)
+      setError('Error deleting product')
+    } finally {
+      setIsDeleting(false)
     }
-    setProducts((prev) => prev.filter((p) => p.id !== productId))
   }
 
-  // Calculate stats
-  const totalProducts = products.length
-  const totalValue = products.reduce((sum, p) => sum + p.final_price, 0)
-  const avgPrice = totalProducts > 0 ? totalValue / totalProducts : 0
-  const categories = [...new Set(products.map((p) => p.category))].length
+  const handleSaveProduct = async (productData: Partial<Product>) => {
+    try {
+      if (selectedProduct) {
+        // Update existing product
+        await productService.update(selectedProduct.id, productData)
+      } else {
+        // Create new product - convert to CreateProductRequest format
+        const createRequest = {
+          classLabel: productData.classLabel || '',
+          model: productData.model || '',
+          marketingName: productData.marketingName || '',
+          category: productData.category || '',
+          retailPrice: productData.retailPrice || 0,
+          finalCustomerPrice: productData.finalCustomerPrice || 0,
+          image: productData.image || '',
+          seuil: productData.seuil || 0,
+          pointsGold: productData.pointsGold || 0,
+          pointsSilver: productData.pointsSilver || 0,
+          pointsBronze: productData.pointsBronze || 0,
+        }
+        await productService.create(createRequest)
+      }
+      
+      // Reload products to show changes
+      await loadProducts()
+    } catch (err) {
+      console.error('Error saving product:', err)
+      throw new Error('Error saving product')
+    }
+  }
 
   return (
     <div className="space-y-6">
+      {/* Loading Overlay */}
+      {isLoading && <LoadingOverlay show={isLoading} />}
+
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
           <p className="text-muted-foreground">Manage your Oraimo product catalog</p>
         </div>
-        <Button onClick={handleCreateProduct}>
+        <Button onClick={handleCreateProduct} disabled={isLoading}>
           <Plus className="h-4 w-4 mr-2" />
           New Product
         </Button>
@@ -127,56 +165,20 @@ export default function ProductsManagementPage() {
       {/* Section Tabs */}
       <SectionTabs section="products" />
 
-      {/* Stats Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Statistics
-          </CardTitle>
-          <CardDescription>Catalog overview</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{totalProducts}</div>
-              <div className="text-sm text-muted-foreground">Products</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{categories}</div>
-              <div className="text-sm text-muted-foreground">Categories</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(avgPrice)}
-              </div>
-              <div className="text-sm text-muted-foreground">Avg Price</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(totalValue)}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Value</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-      {/* Filters */}
-      <ProductsFilters filters={filters} onFiltersChange={handleFiltersChange} onReset={handleResetFilters} />
-
-      {/* Products Grid */}
+      {/* Products Grid with integrated filters */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Products ({filteredProducts.length})</CardTitle>
+              <CardTitle>Products ({totalCount})</CardTitle>
               <CardDescription>Available product catalog</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -185,16 +187,38 @@ export default function ProductsManagementPage() {
               </Button>
             </div>
           </div>
+          
+          {/* Filters integrated in card header */}
+          <div className="pt-4">
+            <ProductsFilters filters={filters} onFiltersChange={handleFiltersChange} onReset={handleResetFilters} />
+          </div>
         </CardHeader>
         <CardContent>
-          <ProductsGrid
-            products={paginatedProducts}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-          />
+          {products.length === 0 && !isLoading && !error ? (
+            <div className="text-center py-12">
+              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">No products found</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {Object.keys(filters).length > 0 ? "Try modifying your filters" : "Start by adding your first product"}
+              </p>
+              {Object.keys(filters).length === 0 && (
+                <Button onClick={handleCreateProduct}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              )}
+            </div>
+          ) : (
+            <ProductsGrid
+              products={products}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              onView={handleViewProduct}
+              onEdit={handleEditProduct}
+              onDelete={handleDeleteProduct}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -204,6 +228,23 @@ export default function ProductsManagementPage() {
         open={isFormDialogOpen}
         onOpenChange={setIsFormDialogOpen}
         onSave={handleSaveProduct}
+      />
+
+      {/* Product View Drawer */}
+      <ProductViewDrawer
+        product={selectedProduct}
+        open={isViewDrawerOpen}
+        onOpenChange={setIsViewDrawerOpen}
+        onEdit={handleEditProduct}
+      />
+
+      {/* Product Delete Dialog */}
+      <ProductDeleteDialog
+        product={productToDelete}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
       />
     </div>
   )

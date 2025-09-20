@@ -92,12 +92,12 @@ export function UsersTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge 
+                  <Badge
                     variant={getTierBadgeVariant(user.storeTiers)}
                     className={
-                      user.storeTiers === 'GOLD' ? 'badge-gold' :
-                      user.storeTiers === 'SILVER' ? 'badge-silver' :
-                      user.storeTiers === 'BRONZE' ? 'badge-bronze' : ''
+                      user.storeTiers === 'GOLD' ? 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300' :
+                      user.storeTiers === 'SILVER' ? 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border-gray-300' :
+                      user.storeTiers === 'BRONZE' ? 'bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 border-orange-300' : ''
                     }
                   >
                     {user.storeTiers}

@@ -26,47 +26,95 @@ export default function UsersManagementPage() {
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  // Load users data
+    // Load users data
   const loadUsers = async () => {
     try {
-      // Ne pas montrer le loading pour les filtres, seulement au chargement initial
       if (users.length === 0) {
         setLoading(true)
       }
-      const response = await userService.search(
-        filters,
-        currentPage - 1, // Backend uses 0-based pagination
-        ITEMS_PER_PAGE,
-        "created,desc"  // Correspond au nom de champ de l'API
-      )
       
-      // Stocker tous les utilisateurs de la réponse API
-      const allUsersFromAPI = response.content as User[]
+      // First try to get all users using the fallback method
+      let allUsersResponse;
+      try {
+        // Try search endpoint with large page size to get all users
+        allUsersResponse = await userService.search(
+          {},  // No filters initially
+          0,   // First page
+          999999, // Very large page size to get all users
+          "createdAt,desc"
+        )
+        console.log('Got users from search:', allUsersResponse)
+      } catch (error) {
+        // If search fails, try direct API call
+        const directResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/users`)
+        
+        if (directResponse.ok) {
+          const data = await directResponse.json()
+          allUsersResponse = {
+            content: Array.isArray(data) ? data : (data.content || []),
+            totalElements: Array.isArray(data) ? data.length : (data.totalElements || 0)
+          }
+        } else {
+          throw new Error('Failed to load users')
+        }
+      }
+      
+      const allUsersFromAPI = allUsersResponse.content as User[]
+      
+      if (!Array.isArray(allUsersFromAPI)) {
+        throw new Error('Invalid API response format')
+      }
+      
       setAllUsers(allUsersFromAPI)
       
-      // Filtrer pour exclure l'utilisateur connecté
+      // Filter out current user
       const currentUserId = session?.user?.userId
-      const filteredUsers = currentUserId 
+      let filteredUsers = currentUserId 
         ? allUsersFromAPI.filter(user => user.id?.toString() !== currentUserId?.toString())
         : allUsersFromAPI
       
-      // Si on utilise le fallback (toutes les données d'un coup), faire la pagination côté client
-      if (response.totalPages === 1 && response.size === filteredUsers.length) {
-        // Mode fallback : pagination côté client
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-        const endIndex = startIndex + ITEMS_PER_PAGE
-        const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
-        
-        setUsers(paginatedUsers)
-        setTotalUsers(filteredUsers.length)
-      } else {
-        // Mode normal : pagination côté serveur
-        setUsers(filteredUsers)
-        setTotalUsers(filteredUsers.length)
+      // Apply search and filters
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase()
+        filteredUsers = filteredUsers.filter(user => 
+          user.firstName?.toLowerCase().includes(searchLower) ||
+          user.lastName?.toLowerCase().includes(searchLower) ||
+          user.email?.toLowerCase().includes(searchLower) ||
+          user.phone?.toLowerCase().includes(searchLower)
+        )
       }
+      
+      if (filters.status) {
+        filteredUsers = filteredUsers.filter(user => user.status === filters.status)
+      }
+      
+      if (filters.role) {
+        filteredUsers = filteredUsers.filter(user => user.role === filters.role)
+      }
+      
+      if (filters.storeTiers) {
+        filteredUsers = filteredUsers.filter(user => 
+          Array.isArray(user.storeTiers) 
+            ? user.storeTiers.includes(filters.storeTiers)
+            : user.storeTiers === filters.storeTiers
+        )
+      }
+      
+      // Client-side pagination
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+      const endIndex = startIndex + ITEMS_PER_PAGE
+      const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
+      
+      setUsers(paginatedUsers)
+      setTotalUsers(filteredUsers.length)
+      
+      console.log('Final users set:', paginatedUsers.length, 'of', filteredUsers.length, 'total')
+      
     } catch (error) {
-      console.error('Error loading users:', error)
-      toast.error('Failed to load users')
+      setUsers([])
+      setAllUsers([])
+      setTotalUsers(0)
+      toast.error('Failed to load users from database. Please check your connection.')
     } finally {
       setLoading(false)
     }
@@ -75,7 +123,7 @@ export default function UsersManagementPage() {
   // Load data on mount and when filters/page change
   useEffect(() => {
     loadUsers()
-  }, [currentPage, filters])
+  }, [currentPage, filters, session?.user?.userId]) // Add userId to dependencies
 
   // Handlers
   const handleFiltersChange = (newFilters: UserFilter) => {
@@ -111,7 +159,9 @@ export default function UsersManagementPage() {
   }
 
   const handleFormSuccess = async () => {
+    console.log('Form success called, reloading users...')
     await loadUsers()
+    console.log('Users reloaded successfully')
   }
 
   const handleNewUser = () => {
@@ -140,10 +190,12 @@ export default function UsersManagementPage() {
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
           <p className="text-muted-foreground">Manage user accounts and permissions</p>
         </div>
-        <Button onClick={handleNewUser}>
-          <Plus className="h-4 w-4 mr-2" />
-          New User
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleNewUser}>
+            <Plus className="h-4 w-4 mr-2" />
+            New User
+          </Button>
+        </div>
       </div>
 
       {/* Section Tabs */}
