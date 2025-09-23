@@ -28,6 +28,7 @@ interface UsersTableProps {
   onPageChange: (page: number) => void
   onToggleStatus: (userId: number, currentStatus: string) => void
   onEdit: (user: User) => void
+  onViewStockDetails: (userId: number) => void
 }
 
 export function UsersTable({
@@ -37,6 +38,7 @@ export function UsersTable({
   onPageChange,
   onToggleStatus,
   onEdit,
+  onViewStockDetails,
 }: UsersTableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false)
@@ -147,6 +149,10 @@ export function UsersTable({
                       <DropdownMenuItem onClick={() => onEdit(user)}>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onViewStockDetails(user.id)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Stock
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -1,251 +1,233 @@
 "use client"
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import * as React from "react"
+import Image from "next/image"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { MoreHorizontal, Eye, Trash2, CheckCircle, XCircle, ImageIcon } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type { ModelDetection } from "@/lib/types"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { 
+  MoreHorizontal, 
+  Eye, 
+  Trash2, 
+  CheckCircle, 
+  XCircle,
+  Target,
+  User,
+  Package,
+  Calendar,
+  Phone,
+  TrendingUp
+} from "lucide-react"
+import { toast } from "sonner"
+import { ModelHistory, ModelHistoryService, ModelHistoryError } from "@/lib/services/model-history-service"
+import { formatNumber } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface DetectionTableProps {
-  detections: ModelDetection[]
-  onDelete: (id: string) => void
+  detections: ModelHistory[]
+  onDetectionDeleted: () => void
+  onViewDetails: (detection: ModelHistory) => void
 }
 
-export function DetectionTable({ detections, onDelete }: DetectionTableProps) {
-  const [selectedDetection, setSelectedDetection] = useState<ModelDetection | null>(null)
+export function DetectionTable({ 
+  detections, 
+  onDetectionDeleted,
+  onViewDetails 
+}: DetectionTableProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [deletingDetection, setDeletingDetection] = React.useState<ModelHistory | null>(null)
+  const [isDeleting, setIsDeleting] = React.useState(false)
 
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", {
+  const handleDeleteClick = (detection: ModelHistory) => {
+    setDeletingDetection(detection)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingDetection) return
+
+    setIsDeleting(true)
+    try {
+      await ModelHistoryService.deleteModelHistory(deletingDetection.id)
+      toast.success("Detection deleted successfully")
+      onDetectionDeleted()
+    } catch (error) {
+      console.error("Error deleting detection:", error)
+      if (error instanceof ModelHistoryError) {
+        toast.error("Delete failed", {
+          description: error.message
+        })
+      } else {
+        toast.error("Failed to delete detection")
+      }
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+      setDeletingDetection(null)
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "short",
+      month: "short", 
       day: "numeric",
       hour: "2-digit",
-      minute: "2-digit",
+      minute: "2-digit"
     })
+  }
 
-  const formatConfidence = (confidence: number) => `${(confidence * 100).toFixed(1)}%`
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 0.9) return "text-green-600 bg-green-50"
+    if (confidence >= 0.7) return "text-yellow-600 bg-yellow-50"
+    return "text-red-600 bg-red-50"
+  }
+
+  const getConfidenceBadgeVariant = (confidence: number) => {
+    if (confidence >= 0.9) return "default"
+    if (confidence >= 0.7) return "secondary"
+    return "destructive"
+  }
+
+  if (detections.length === 0) {
+    return (
+      <div className="border rounded-lg p-12">
+        <div className="text-center">
+          <Target className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-4 text-lg font-semibold">No detections found</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            No model detection entries match your current filters.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
-      <Card className="border-0 shadow-sm bg-card">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-heading">Detection History</CardTitle>
-        </CardHeader>
-
+      <Card className="shadow-md rounded-lg">
         <CardContent>
-          <div className="rounded-lg border border-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="font-medium">Product</TableHead>
-                  <TableHead className="font-medium">User</TableHead>
-                  <TableHead className="font-medium">Model Version</TableHead>
-                  <TableHead className="font-medium">Confidence</TableHead>
-                  <TableHead className="font-medium">Status</TableHead>
-                  <TableHead className="font-medium">Date</TableHead>
-                  <TableHead className="font-medium">Image</TableHead>
-                  <TableHead className="w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
+          <Table>
+            <TableHeader>
+              <TableRow className="text-center">
+                <TableHead className="w-12 text-center">ID</TableHead>
+                <TableHead className="text-center">User</TableHead>
+                <TableHead className="text-center">Product</TableHead>
+                <TableHead className="text-center">Confidence</TableHead>
+                <TableHead className="text-center">Result</TableHead>
+                <TableHead className="text-center">Date</TableHead>
+                <TableHead className="w-12 text-center">Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {detections.map((detection) => (
+                <TableRow key={detection.id} className="hover:bg-muted/50 text-center">
+                  <TableCell className="font-medium text-center">#{detection.id}</TableCell>
 
-              <TableBody>
-                {detections.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      No detections found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  detections.map((detection) => (
-                    <TableRow key={detection.id} className="hover:bg-muted/30">
-                      <TableCell className="font-medium">{detection.product_name}</TableCell>
-                      <TableCell>{detection.user_name}</TableCell>
+                  {/* User Info */}
+                  <TableCell className="text-center">
+                    <div>
+                      <p className="font-medium">{detection.userPhone}</p>
+                    </div>
+                  </TableCell>
 
-                      <TableCell>
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {detection.model_version}
-                        </Badge>
-                      </TableCell>
+                  {/* Product Info */}
+                  <TableCell className="text-center">
+                    <div>
+                      <p className="font-medium">{detection.productModel}</p>
+                    </div>
+                  </TableCell>
 
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 bg-muted rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${
-                                detection.confidence >= 0.8
-                                  ? "bg-emerald-500"
-                                  : detection.confidence >= 0.6
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
-                              }`}
-                              style={{ width: `${detection.confidence * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">{formatConfidence(detection.confidence)}</span>
-                        </div>
-                      </TableCell>
-
-                      <TableCell>
-                        <Badge
-                          variant={detection.success ? "default" : "destructive"}
-                          className={`gap-1 ${
-                            detection.success
-                              ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                              : "bg-red-100 text-red-800 border-red-200"
+                  {/* Confidence */}
+                  <TableCell className="text-center">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-center space-x-2">
+                        <span className={`text-sm font-semibold ${getConfidenceColor(detection.confidence).split(' ')[0]}`}>
+                          {Math.round(detection.confidence * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div 
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            detection.confidence >= 0.9 ? "bg-green-500" :
+                            detection.confidence >= 0.7 ? "bg-yellow-500" : "bg-red-500"
                           }`}
-                        >
-                          {detection.success ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                          {detection.success ? "Success" : "Failed"}
-                        </Badge>
-                      </TableCell>
+                          style={{ width: `${detection.confidence * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </TableCell>
 
-                      <TableCell className="text-muted-foreground">{formatDate(detection.date)}</TableCell>
+                  {/* Result */}
+                  <TableCell className="text-center">
+                    <Badge variant={detection.success ? "default" : "destructive"}>
+                      {detection.success ? "Success" : "Failed"}
+                    </Badge>
+                  </TableCell>
 
-                      <TableCell>
-                        {detection.image_url ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedDetection(detection)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <ImageIcon className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
+                  {/* Date */}
+                  <TableCell className="text-center">
+                    <p className="text-sm text-muted-foreground">{formatDate(detection.createdAt)}</p>
+                  </TableCell>
 
-                      {/* Actions */}
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          {/* ✅ PAS de `asChild` : le Trigger rend un <button> natif qui supporte ref */}
-                          <DropdownMenuTrigger
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-sm shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
-                            aria-label="Row actions"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </DropdownMenuTrigger>
-
-                          <DropdownMenuContent align="end" className="w-40 z-50">
-                            <DropdownMenuItem
-                              onClick={() => setSelectedDetection(detection)}
-                              className="gap-2"
-                            >
-                              <Eye className="h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => onDelete(detection.id)}
-                              className="gap-2 text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  {/* Details */}
+                  <TableCell className="text-center">
+                    <Button variant="ghost" size="sm" onClick={() => onViewDetails(detection)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
-      {/* Detection Details Dialog */}
-      <Dialog open={!!selectedDetection} onOpenChange={() => setSelectedDetection(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Detection Details</DialogTitle>
-          </DialogHeader>
-
-          {selectedDetection && (
-            <div className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Detection ID</label>
-                    <p className="font-mono text-sm">{selectedDetection.id}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Product</label>
-                    <p className="font-medium">{selectedDetection.product_name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">User</label>
-                    <p className="font-medium">{selectedDetection.user_name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Model Version</label>
-                    <Badge variant="outline" className="font-mono">
-                      {selectedDetection.model_version}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Confidence Score</label>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-muted rounded-full h-3">
-                        <div
-                          className={`h-3 rounded-full ${
-                            selectedDetection.confidence >= 0.8
-                              ? "bg-emerald-500"
-                              : selectedDetection.confidence >= 0.6
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
-                          }`}
-                          style={{ width: `${selectedDetection.confidence * 100}%` }}
-                        />
-                      </div>
-                      <span className="font-medium">{formatConfidence(selectedDetection.confidence)}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Status</label>
-                    <div>
-                      <Badge variant={selectedDetection.success ? "default" : "destructive"} className="gap-1">
-                        {selectedDetection.success ? (
-                          <CheckCircle className="h-3 w-3" />
-                        ) : (
-                          <XCircle className="h-3 w-3" />
-                        )}
-                        {selectedDetection.success ? "Success" : "Failed"}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Date</label>
-                    <p className="font-medium">{formatDate(selectedDetection.date)}</p>
-                  </div>
-                </div>
-              </div>
-
-              {selectedDetection.image_url && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Detection Image</label>
-                  <div className="mt-2 border border-border rounded-lg overflow-hidden">
-                    <img
-                      src={selectedDetection.image_url || "/placeholder.svg"}
-                      alt="Detection"
-                      className="w-full h-64 object-cover"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Detection</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete detection #{deletingDetection?.id}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

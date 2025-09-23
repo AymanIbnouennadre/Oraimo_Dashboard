@@ -9,7 +9,18 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
- 
+  async rewrites() {
+    return [
+      {
+        source: '/images/:path*',
+        destination: '/api/images/:path*',
+      },
+      {
+        source: '/dashboard/images/:path*',
+        destination: '/api/images/:path*',
+      },
+    ]
+  },
 }
 
 export default nextConfig

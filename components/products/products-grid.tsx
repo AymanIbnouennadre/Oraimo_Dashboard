@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -38,13 +38,13 @@ export function ProductsGrid({ products, currentPage, totalPages, onPageChange, 
         {products.map((product) => (
           <Card key={product.id} className="overflow-hidden">
             <CardHeader className="p-0">
-              <div className="aspect-square relative bg-muted">
+              <div className="aspect-square relative bg-gray-50 overflow-hidden">
                 {product.image ? (
                   <Image
                     src={product.image || "/placeholder.svg"}
                     alt={product.marketingName}
                     fill
-                    className="object-cover"
+                    className="object-contain p-4 hover:scale-105 transition-transform duration-200"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (

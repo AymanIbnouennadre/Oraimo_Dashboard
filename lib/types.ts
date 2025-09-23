@@ -136,6 +136,8 @@ export interface ProductFilter {
   maxPrice?: number
   minSeuil?: number
   maxSeuil?: number
+  sortBy?: "name" | "price_asc" | "price_desc" | "points" | "created"
+  groupBy?: "category" | "price_range" | "none"
 }
 
 // Legacy Product type (to be removed gradually)
@@ -167,6 +169,58 @@ export interface StockMovement {
   detection_id?: string
 }
 
+// Stock History Management Types (matching real backend API structure)
+export interface StockHistory {
+  id: number
+  userId: number
+  userPhone: string
+  productId: number
+  productModel: string
+  movementType: "Purchase" | "Sale"
+  quantity: number
+  points: number
+  detectionId: number
+  createdAt: string
+  updatedAt: string | null
+  price: number
+  // Extended fields for UI (populated from relations)
+  userName?: string
+  productMarketingName?: string
+}
+
+export interface CreateStockHistoryRequest {
+  userId: number
+  productId: number
+  movementType: "Purchase" | "Sale"
+  quantity: number
+  price: number
+  detectionId?: number
+}
+
+export interface UpdateStockHistoryRequest {
+  userId?: number
+  productId?: number
+  movementType?: "Purchase" | "Sale"
+  quantity?: number
+  price?: number
+  detectionId?: number
+}
+
+export interface StockHistoryFilters {
+  movementType?: "Purchase" | "Sale"
+  createdFrom?: string
+  createdTo?: string
+  minPrice?: number
+  maxPrice?: number
+  minQuantity?: number
+  maxQuantity?: number
+  modelLike?: string
+  detectionId?: number
+  userNameLike?: string
+}
+
+
+
 export interface ModelDetection {
   id: string
   date: string
@@ -178,6 +232,17 @@ export interface ModelDetection {
   confidence: number
   success: boolean
   image_url?: string
+}
+
+// Detection data from model history API (matching backend structure)
+export interface Detection {
+  id: number
+  confidence: number
+  success: boolean
+  model_version?: string
+  image_url?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface KPI {

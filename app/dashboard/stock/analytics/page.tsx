@@ -18,7 +18,6 @@ import {
   Calendar, Users, Activity, Target, Star, Trophy, Zap, AlertCircle, CheckCircle2,
   ArrowUpRight, ArrowDownRight, PackageX, Warehouse
 } from "lucide-react"
-import { SectionTabs } from "@/components/layout/section-tabs"
 
 // Mock data for comprehensive stock analytics - Realistic September 2025 data
 const mockStockKPIs = {
@@ -237,9 +236,6 @@ export default function StockAnalyticsPage() {
           </div>
         </div>
       </div>
-
-      {/* Section Tabs */}
-      <SectionTabs section="stock" />
 
       {/* Stock Alerts */}
       {mockStockAlerts.length > 0 && (

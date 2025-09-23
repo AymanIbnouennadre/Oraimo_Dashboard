@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "userId": 3,
+    "userPhone": "0600000003",
+    "productId": 1,
+    "productModel": "OTW-330S",
+    "movementType": "Purchase",
+    "quantity": 10,
+    "points": 390,
+    "detectionId": 1,
+    "createdAt": "2025-09-16T15:49:52",
+    "updatedAt": null,
+    "price": 169.0
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "userPhone": "0600000001", 
+    "productId": 2,
+    "productModel": "FreePods-Lite",
+    "movementType": "Sale",
+    "quantity": 5,
+    "points": 200,
+    "detectionId": 2,
+    "createdAt": "2025-09-16T14:30:22",
+    "updatedAt": null,
+    "price": 85.5
+  },
+  {
+    "id": 3,
+    "userId": 2,
+    "userPhone": "0600000002",
+    "productId": 3,
+    "productModel": "PowerCube-65W",
+    "movementType": "Purchase",
+    "quantity": 15,
+    "points": 450,
+    "detectionId": 3,
+    "createdAt": "2025-09-16T13:15:10",
+    "updatedAt": "2025-09-16T16:20:00",
+    "price": 45.0
+  },
+  {
+    "id": 4,
+    "userId": 4,
+    "userPhone": "0600000004",
+    "productId": 1,
+    "productModel": "OTW-330S",
+    "movementType": "Sale",
+    "quantity": 3,
+    "points": 117,
+    "detectionId": 4,
+    "createdAt": "2025-09-16T12:00:45",
+    "updatedAt": null,
+    "price": 169.0
+  },
+  {
+    "id": 5,
+    "userId": 1,
+    "userPhone": "0600000001",
+    "productId": 4,
+    "productModel": "Watch5-Lite",
+    "movementType": "Purchase",
+    "quantity": 2,
+    "points": 320,
+    "detectionId": 5,
+    "createdAt": "2025-09-16T11:45:30",
+    "updatedAt": null,
+    "price": 120.0
+  }
+]

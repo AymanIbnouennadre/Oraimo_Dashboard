@@ -17,7 +17,6 @@ import {
   Trophy
 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SectionTabs } from "@/components/layout/section-tabs"
 
 // Mock data for products analytics - Realistic September 2025 data
 const mockProductsKPIs = {
@@ -197,9 +196,6 @@ export default function ProductsAnalyticsPage() {
           </div>
         </div>
       </div>
-
-      {/* Section Tabs */}
-      <SectionTabs section="products" />
 
       {/* Main KPI Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

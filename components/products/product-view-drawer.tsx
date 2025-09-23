@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Package, X } from "lucide-react"
+import { Package, X, Edit } from "lucide-react"
 import type { Product } from "@/lib/types"
 import Image from "next/image"
 
@@ -16,9 +16,10 @@ interface ProductViewDrawerProps {
   product: Product | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  onEdit: (product: Product) => void
 }
 
-export function ProductViewDrawer({ product, open, onOpenChange }: ProductViewDrawerProps) {
+export function ProductViewDrawer({ product, open, onOpenChange, onEdit }: ProductViewDrawerProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-MA", {
       style: "currency",
@@ -45,16 +46,22 @@ export function ProductViewDrawer({ product, open, onOpenChange }: ProductViewDr
         <div className="flex flex-col h-full">
           {/* Header */}
           <DialogHeader className="flex-shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Package className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                  <Package className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold">{product.marketingName}</DialogTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {product.model} • ID #{product.id}
+                  </p>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="text-xl font-semibold">{product.marketingName}</DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  {product.model} • ID #{product.id}
-                </p>
-              </div>
+              <Button onClick={() => onEdit(product)} size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Product
+              </Button>
             </div>
           </DialogHeader>
 
@@ -64,14 +71,15 @@ export function ProductViewDrawer({ product, open, onOpenChange }: ProductViewDr
               {/* Product Image */}
               <div className="lg:col-span-1">
                 <div className="sticky top-0">
-                  <div className="aspect-square relative bg-muted rounded-xl overflow-hidden border">
+                  <div className="aspect-square relative bg-white rounded-xl overflow-hidden border shadow-sm">
                     {product.image ? (
                       <Image
                         src={product.image}
                         alt={product.marketingName}
                         fill
-                        className="object-cover"
+                        className="object-contain p-6 hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 1024px) 100vw, 33vw"
+                        priority
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">

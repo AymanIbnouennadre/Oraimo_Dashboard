@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "firstName": "Ahmed",
+    "lastName": "Ben Ali",
+    "email": "ahmed.benali@example.com",
+    "phone": "+212600123456",
+    "address": "Casablanca, Morocco",
+    "status": "APPROVED",
+    "storeTiers": "GOLD",
+    "role": "CUSTOMER",
+    "created": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": 2,
+    "firstName": "Fatima",
+    "lastName": "Zahra",
+    "email": "fatima.zahra@example.com",
+    "phone": "+212600234567",
+    "address": "Rabat, Morocco",
+    "status": "APPROVED",
+    "storeTiers": "SILVER",
+    "role": "CUSTOMER",
+    "created": "2024-01-02T00:00:00Z"
+  },
+  {
+    "id": 3,
+    "firstName": "Mohammed",
+    "lastName": "Karim",
+    "email": "mohammed.karim@example.com",
+    "phone": "+212600345678",
+    "address": "Marrakech, Morocco",
+    "status": "APPROVED",
+    "storeTiers": "BRONZE",
+    "role": "CUSTOMER",
+    "created": "2024-01-03T00:00:00Z"
+  },
+  {
+    "id": 4,
+    "firstName": "Youssef",
+    "lastName": "Admin",
+    "email": "youssef.admin@oraimo.com",
+    "phone": "+212600456789",
+    "address": "Casablanca, Morocco",
+    "status": "APPROVED",
+    "storeTiers": "GOLD",
+    "role": "ADMIN",
+    "created": "2024-01-01T00:00:00Z"
+  }
+]

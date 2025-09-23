@@ -16,7 +16,6 @@ import {
   Users, UserPlus, Activity, UserCheck, Download, TrendingUp, TrendingDown, 
   Calendar, Filter, Trophy, ShoppingCart, Package, Target, Star
 } from "lucide-react"
-import { SectionTabs } from "@/components/layout/section-tabs"
 import type { User } from "@/lib/types"
 import { formatPoints } from "@/lib/utils"
 
@@ -276,9 +275,6 @@ export default function UsersAnalyticsPage() {
           </div>
         </div>
       </div>
-
-      {/* Section Tabs */}
-      <SectionTabs section="users" />
 
       {/* Main KPI Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

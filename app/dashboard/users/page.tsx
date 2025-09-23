@@ -3,10 +3,10 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Users } from "lucide-react"
-import { SectionTabs } from "@/components/layout/section-tabs"
 import { UsersTable } from "@/components/users/users-table"
 import { UsersFilters } from "@/components/users/users-filters"
 import { UserFormDialog } from "@/components/users/user-form-dialog"
+import { StockDetailDialog } from "@/components/users/stock-detail-dialog"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { toast } from "sonner"
 import { useAuth } from "@/components/auth/auth-provider"
@@ -25,6 +25,8 @@ export default function UsersManagementPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [stockDetailDialogOpen, setStockDetailDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
     // Load users data
   const loadUsers = async () => {
@@ -169,6 +171,11 @@ export default function UsersManagementPage() {
     setFormDialogOpen(true)
   }
 
+  const handleViewStockDetails = (userId: number) => {
+    setSelectedUserId(userId);
+    setStockDetailDialogOpen(true);
+  };
+
   const totalPages = Math.ceil(totalUsers / ITEMS_PER_PAGE)
 
   // Reset à la page 1 si on est sur une page qui n'existe plus après filtrage
@@ -198,9 +205,6 @@ export default function UsersManagementPage() {
         </div>
       </div>
 
-      {/* Section Tabs */}
-      <SectionTabs section="users" />
-
       {/* Users Management Card - Filters + Table Combined */}
       <Card>
         <CardHeader>
@@ -222,6 +226,7 @@ export default function UsersManagementPage() {
               onPageChange={setCurrentPage}
               onToggleStatus={handleToggleStatus}
               onEdit={handleEdit}
+              onViewStockDetails={handleViewStockDetails} // Pass the handler
             />
           )}
         </CardContent>
@@ -233,6 +238,13 @@ export default function UsersManagementPage() {
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
         onSuccess={handleFormSuccess}
+      />
+
+      {/* Stock Detail Dialog */}
+      <StockDetailDialog
+        userId={selectedUserId}
+        open={stockDetailDialogOpen}
+        onOpenChange={setStockDetailDialogOpen}
       />
     </div>
   )

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Package, Grid3X3, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { SectionTabs } from "@/components/layout/section-tabs"
 import { ProductsGrid } from "@/components/products/products-grid"
 import { ProductsFilters } from "@/components/products/products-filters"
 import { ProductFormDialog } from "@/components/products/product-form-dialog"
@@ -161,9 +160,6 @@ export default function ProductsManagementPage() {
           New Product
         </Button>
       </div>
-
-      {/* Section Tabs */}
-      <SectionTabs section="products" />
 
       {/* Error Alert */}
       {error && (
