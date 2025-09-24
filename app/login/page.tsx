@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Eye, EyeOff, Phone } from "lucide-react"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net"
 const MA_PHONE_REGEX = /^0[67]\d{8}$/ // 06/07 + 8 chiffres
 
 type FormErrors = { phone?: string; password?: string; general?: string }

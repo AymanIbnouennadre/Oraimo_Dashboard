@@ -98,7 +98,7 @@ export const mockAuth = {
 export const forgotPasswordService = {
   async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
     try {
-      const response = await fetch('http://localhost:8080/auth/forgot-password', {
+      const response = await fetch('https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export const forgotPasswordService = {
 export const verifyOtpService = {
   async verifyCode(email: string, code: string): Promise<VerifyOtpResponse> {
     try {
-      const response = await fetch('http://localhost:8080/auth/verify-otp', {
+      const response = await fetch('https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ export const verifyOtpService = {
 export const resetPasswordService = {
   async resetPassword(email: string, code: string, newPassword: string): Promise<ResetPasswordResponse> {
     try {
-      const response = await fetch('http://localhost:8080/auth/reset-password', {
+      const response = await fetch('https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

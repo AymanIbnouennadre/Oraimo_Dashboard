@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Loader2, User, Lock, CheckCircle, Shield } from "lucide-react"
 import { useAuth } from "@/components/auth/auth-provider"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net"
 const MA_PHONE_REGEX = /^0[67]\d{8}$/ // 06/07 + 8 digits = 10 total
 
 type UserDto = {

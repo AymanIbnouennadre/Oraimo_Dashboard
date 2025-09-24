@@ -85,7 +85,7 @@ C'est la solution la plus simple et efficace ! 🎯
 
 ### Endpoint à créer : `POST /auth/validate-email`
 
-**URL :** `http://localhost:8080/auth/validate-email`
+**URL :** `https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/validate-email`
 
 **Request Body :**
 ```json
@@ -212,21 +212,21 @@ Une fois implémenté, testez avec :
 
 **Email admin valide :**
 ```bash
-curl -X POST http://localhost:8080/auth/validate-email \
+curl -X POST https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/validate-email \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@oraimo.com"}'
 ```
 
 **Email non-admin :**
 ```bash
-curl -X POST http://localhost:8080/auth/validate-email \
+curl -X POST https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/validate-email \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com"}'
 ```
 
 **Email inexistant :**
 ```bash
-curl -X POST http://localhost:8080/auth/validate-email \
+curl -X POST https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/validate-email \
   -H "Content-Type: application/json" \
   -d '{"email":"inexistant@example.com"}'
 ```

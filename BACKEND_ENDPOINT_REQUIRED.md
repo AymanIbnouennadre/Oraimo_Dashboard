@@ -6,7 +6,7 @@ Votre frontend essaie d'appeler un endpoint qui n'existe pas encore dans votre b
 
 ### Endpoint à créer : `POST /auth/verify-reset-code`
 
-**URL :** `http://localhost:8080/auth/verify-reset-code`
+**URL :** `https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/auth/verify-reset-code`
 
 **Request Body :**
 ```json

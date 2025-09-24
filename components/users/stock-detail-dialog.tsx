@@ -36,17 +36,17 @@ export function StockDetailDialog({ userId, open, onOpenChange }: StockDetailDia
         Authorization: `Bearer ${token}`,
       };
       Promise.all([
-        fetch(`http://localhost:8080/api/history-stock/users/${userId}/stock/total`, { headers })
+        fetch(`https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/api/history-stock/users/${userId}/stock/total`, { headers })
           .then((res) => {
             console.log("Total stock response status:", res.status);
             return res.ok ? res.json() : Promise.reject("Failed to fetch total stock");
           }),
-        fetch(`http://localhost:8080/api/history-stock/users/${userId}/points`, { headers })
+        fetch(`https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/api/history-stock/users/${userId}/points`, { headers })
           .then((res) => {
             console.log("Total points response status:", res.status);
             return res.ok ? res.json() : Promise.reject("Failed to fetch total points");
           }),
-        fetch(`http://localhost:8080/api/history-stock/users/${userId}/stock/by-product`, { headers })
+        fetch(`https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net/api/history-stock/users/${userId}/stock/by-product`, { headers })
           .then((res) => {
             console.log("Stock by product response status:", res.status);
             return res.ok ? res.json() : Promise.reject("Failed to fetch stock details");

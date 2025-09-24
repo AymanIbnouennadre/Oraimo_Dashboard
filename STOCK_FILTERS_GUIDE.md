@@ -115,7 +115,7 @@ GET /api/history-stock/search?userNameLike=nom&productNameLike=produit&movementT
 ## 🐛 Résolution des Problèmes
 
 ### **Filtres ne marchent pas :**
-1. Vérifiez que le backend est démarré sur `http://localhost:8080`
+1. Vérifiez que le backend est démarré sur `https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net`
 2. Consultez la console pour les erreurs API
 3. Le fallback côté client devrait fonctionner automatiquement
 

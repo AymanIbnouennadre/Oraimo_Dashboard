@@ -61,7 +61,7 @@ export function StockMovementDetails({ movementId }: Props) {
           }
 
           const token = getAuthToken()
-          const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080"
+          const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net"
           
           const pointsResponse = await fetch(`${BACKEND_URL}/api/products/users/${stockMovement.userId}/products/${stockMovement.productId}/points`, {
             method: 'GET',

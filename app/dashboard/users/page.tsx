@@ -49,7 +49,7 @@ export default function UsersManagementPage() {
         console.log('Got users from search:', allUsersResponse)
       } catch (error) {
         // If search fails, try direct API call
-        const directResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/users`)
+        const directResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net'}/api/users`)
         
         if (directResponse.ok) {
           const data = await directResponse.json()
