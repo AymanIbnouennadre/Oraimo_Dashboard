@@ -74,7 +74,7 @@ export function ProductViewDrawer({ product, open, onOpenChange, onEdit }: Produ
                   <div className="aspect-square relative bg-white rounded-xl overflow-hidden border shadow-sm">
                     {product.image ? (
                       <Image
-                        src={product.image}
+                        src={`/${product.image.replace(/\\/g, '/')}`}
                         alt={product.marketingName}
                         fill
                         className="object-contain p-6 hover:scale-105 transition-transform duration-300"

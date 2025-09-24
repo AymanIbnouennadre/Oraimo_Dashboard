@@ -7,7 +7,7 @@ import type {
   PaginatedResponse 
 } from "@/lib/types"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://oraimosmartscan-cbdfada7brfyfwbg.francecentral-01.azurewebsites.net"
+const BACKEND_URL = ""
 
 // Helper function to get auth token from cookies
 function getAuthToken(): string | null {
@@ -87,7 +87,7 @@ export const productService = {
     filters: ProductFilter = {},
     page: number = 0,
     size: number = 20,
-    sort: string = "createdAt,desc"
+    sort: string = "id,desc"
   ): Promise<PaginatedResponse<Product>> {
     try {
       const params = new URLSearchParams()
@@ -105,7 +105,7 @@ export const productService = {
       
       return await apiRequest<PaginatedResponse<Product>>(filterUrl)
     } catch (error) {
-      // Fallback: get all products and filter client-side
+      console.log('Filter failed, falling back to client-side filtering:', error)
       try {
         const allProductsResponse = await apiRequest<any>('/api/products')
         

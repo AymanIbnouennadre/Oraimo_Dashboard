@@ -15,8 +15,7 @@ import {
   XCircle,
   RefreshCw,
   Download,
-  AlertCircle,
-  Activity
+  AlertCircle
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -279,28 +278,6 @@ export default function ModelPage() {
     }
   }
 
-  const testAPI = async () => {
-    try {
-      toast({
-        title: "Info",
-        description: "Testing API connection...",
-        variant: "default",
-      })
-      const testResult = await ModelHistoryService.getAllModelHistory(0, 1)
-      toast({
-        title: "Success",
-        description: `API Test Success! Found ${testResult.totalElements} records`,
-        variant: "default",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: `API Test Failed: ${error instanceof ModelHistoryError ? error.message : 'Unknown error'}`,
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
@@ -312,10 +289,6 @@ export default function ModelPage() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={testAPI} size="sm">
-            <Activity className="h-4 w-4 mr-2" />
-            Test API
-          </Button>
           <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh

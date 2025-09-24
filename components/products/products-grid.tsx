@@ -2,29 +2,18 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import { Edit, Trash2, Package, Eye } from "lucide-react"
 import type { Product } from "@/lib/types"
 import Image from "next/image"
 
 interface ProductsGridProps {
   products: Product[]
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
   onView: (product: Product) => void
   onEdit: (product: Product) => void
   onDelete: (productId: number) => void
 }
 
-export function ProductsGrid({ products, currentPage, totalPages, onPageChange, onView, onEdit, onDelete }: ProductsGridProps) {
+export function ProductsGrid({ products, onView, onEdit, onDelete }: ProductsGridProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-MA", {
       style: "currency",
@@ -41,7 +30,7 @@ export function ProductsGrid({ products, currentPage, totalPages, onPageChange, 
               <div className="aspect-square relative bg-gray-50 overflow-hidden">
                 {product.image ? (
                   <Image
-                    src={product.image || "/placeholder.svg"}
+                    src={`/${product.image.replace(/\\/g, '/')}`}
                     alt={product.marketingName}
                     fill
                     className="object-contain p-4 hover:scale-105 transition-transform duration-200"
@@ -130,52 +119,6 @@ export function ProductsGrid({ products, currentPage, totalPages, onPageChange, 
           </Card>
         ))}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    if (currentPage > 1) onPageChange(currentPage - 1)
-                  }}
-                  className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onPageChange(page)
-                    }}
-                    isActive={page === currentPage}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    if (currentPage < totalPages) onPageChange(currentPage + 1)
-                  }}
-                  className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
     </>
   )
 }

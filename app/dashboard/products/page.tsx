@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Package, Grid3X3, AlertCircle } from "lucide-react"
+import { Plus, Package, Grid3X3, AlertCircle, RefreshCw } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ProductsGrid } from "@/components/products/products-grid"
 import { ProductsFilters } from "@/components/products/products-filters"
@@ -14,13 +14,10 @@ import { useToast } from "@/hooks/use-toast"
 import type { Product, ProductFilter } from "@/lib/types"
 import { productService } from "@/lib/services/product-service"
 
-const ITEMS_PER_PAGE = 12
-
 export default function ProductsManagementPage() {
   const { toast } = useToast()
   const [products, setProducts] = useState<Product[]>([])
   const [filters, setFilters] = useState<ProductFilter>({})
-  const [currentPage, setCurrentPage] = useState(1)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
   const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false)
@@ -29,28 +26,18 @@ export default function ProductsManagementPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [totalCount, setTotalCount] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
 
   // Load products from API
   const loadProducts = async () => {
     try {
       setError(null)
-      const result = await productService.filter(
-        filters,
-        currentPage - 1,
-        ITEMS_PER_PAGE,
-      )
+      const result = await productService.filter(filters)
       
       setProducts(result.content)
-      setTotalCount(result.totalElements)
-      setTotalPages(result.totalPages)
     } catch (err) {
       console.error('Error loading products:', err)
       setError('Error loading products')
       setProducts([])
-      setTotalCount(0)
-      setTotalPages(0)
     }
   }
 
@@ -60,22 +47,31 @@ export default function ProductsManagementPage() {
     loadProducts().finally(() => setIsLoading(false))
   }, [])
 
-  // Load products when filters/page change without loading spinner
+  // Load products when filters change without loading spinner
   useEffect(() => {
-    if (currentPage > 1 || Object.keys(filters).length > 0) {
+    if (Object.keys(filters).length > 0) {
       loadProducts()
     }
-  }, [filters, currentPage])
+  }, [filters])
 
   // Handlers
   const handleFiltersChange = (newFilters: ProductFilter) => {
     setFilters(newFilters)
-    setCurrentPage(1)
   }
 
   const handleResetFilters = () => {
     setFilters({})
-    setCurrentPage(1)
+  }
+
+  const handleRefresh = () => {
+    setFilters({})
+    setIsLoading(true)
+    loadProducts().finally(() => setIsLoading(false))
+    toast({
+      title: "Success",
+      description: "Data refreshed",
+      variant: "default",
+    })
   }
 
   const handleCreateProduct = () => {
@@ -182,10 +178,16 @@ export default function ProductsManagementPage() {
           <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
           <p className="text-muted-foreground">Manage your Oraimo product catalog</p>
         </div>
-        <Button onClick={handleCreateProduct} disabled={isLoading}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Product
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button onClick={handleCreateProduct} disabled={isLoading}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Product
+          </Button>
+        </div>
       </div>
 
       {/* Error Alert */}
@@ -201,7 +203,7 @@ export default function ProductsManagementPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Products ({totalCount})</CardTitle>
+              <CardTitle>Products ({products.length})</CardTitle>
               <CardDescription>Available product catalog</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -234,9 +236,6 @@ export default function ProductsManagementPage() {
           ) : (
             <ProductsGrid
               products={products}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
               onView={handleViewProduct}
               onEdit={handleEditProduct}
               onDelete={handleDeleteProduct}

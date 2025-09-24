@@ -6,6 +6,8 @@ import { StockFilters } from "@/components/stock/stock-filters"
 import { StockHistoryService } from "@/lib/services/stock-history"
 import { enrichStockHistory } from "@/lib/utils/stock-utils"
 import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
 import type { StockHistory, StockHistoryFilters, Product, User } from "@/lib/types"
 
 export default function StockPage() {
@@ -150,6 +152,35 @@ export default function StockPage() {
     }
   }
 
+  const handleRefresh = () => {
+    setFilters({})
+    setLoading(true)
+    const loadInitialData = async () => {
+      try {
+        // Load all stock history
+        const historyResponse = await StockHistoryService.getAllStockHistory()
+        const enrichedMovements = enrichStockHistory(historyResponse.content || [])
+        
+        // Store all movements for reference
+        setAllMovements(enrichedMovements)
+        setMovements(enrichedMovements)
+        
+      } catch (error) {
+        console.error("Failed to load initial data:", error)
+        setMovements([])
+        setAllMovements([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadInitialData()
+    toast({
+      title: "Success",
+      description: "Data refreshed",
+      variant: "default",
+    })
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -166,9 +197,15 @@ export default function StockPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Stock Management</h1>
-        <p className="text-muted-foreground">Track and manage inventory movements</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Stock Management</h1>
+          <p className="text-muted-foreground">Track and manage inventory movements</p>
+        </div>
+        <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <div className="space-y-0">

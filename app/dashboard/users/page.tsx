@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Users } from "lucide-react"
+import { Plus, Users, RefreshCw } from "lucide-react"
 import { UsersTable } from "@/components/users/users-table"
 import { UsersFilters } from "@/components/users/users-filters"
 import { UserFormDialog } from "@/components/users/user-form-dialog"
@@ -189,6 +189,18 @@ export default function UsersManagementPage() {
     setStockDetailDialogOpen(true);
   };
 
+  const handleRefresh = () => {
+    setFilters({})
+    setCurrentPage(1)
+    setLoading(true)
+    loadUsers()
+    toast({
+      title: "Success",
+      description: "Data refreshed",
+      variant: "default",
+    })
+  }
+
   const totalPages = Math.ceil(totalUsers / ITEMS_PER_PAGE)
 
   // Reset à la page 1 si on est sur une page qui n'existe plus après filtrage
@@ -211,6 +223,10 @@ export default function UsersManagementPage() {
           <p className="text-muted-foreground">Manage user accounts and permissions</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
           <Button onClick={handleNewUser}>
             <Plus className="h-4 w-4 mr-2" />
             New User
