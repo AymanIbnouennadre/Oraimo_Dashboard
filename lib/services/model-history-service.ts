@@ -174,7 +174,7 @@ export class ModelHistoryService {
   }
 
   /**
-   * Récupère une détection par ID depuis l'historique des modèles
+   * Retrieve a detection by ID from model history
    * GET /api/history-model/{id}
    */
   static async getModelHistoryById(id: number): Promise<ModelHistory> {

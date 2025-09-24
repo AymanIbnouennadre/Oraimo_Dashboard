@@ -43,13 +43,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [signingOut, setSigningOut] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // Attendre l'hydratation côté client
+  // Wait for client-side hydration
   useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) {
-    return null // ou un loader
+    return null // or a loader
   }
 
   const navigationItems = [
@@ -99,7 +99,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
-      {/* Overlay plein écran pendant la déconnexion */}
+      {/* Full screen overlay during logout */}
       <LoadingOverlay show={signingOut} label="Signing out…" />
 
       <div className="flex min-h-screen w-full bg-background">
@@ -170,7 +170,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <SidebarMenu className="p-2">
               <SidebarMenuItem>
                 <DropdownMenu>
-                  {/* Trigger natif (meilleure compat) */}
+                  {/* Native trigger (better compatibility) */}
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
@@ -196,16 +196,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {/* Sign Out avec overlay + anti double-clic */}
+                    {/* Sign Out with overlay + anti double-click */}
                     <DropdownMenuItem
                       onSelect={() => {
                         if (signingOut) return
                         setSigningOut(true)
-                        // laisse le menu se fermer + rend l’overlay, puis lance le logout
+                        // let the menu close + render the overlay, then start logout
                         requestAnimationFrame(() => {
                           setTimeout(() => {
-                            logout() // supprime le cookie + push("/login")
-                          }, 100) // 80–120ms suffit
+                            logout() // remove cookie + push("/login")
+                          }, 100) // 80–120ms is enough
                         })
                       }}
                       className={`flex items-center gap-2 text-destructive ${signingOut ? "opacity-60 pointer-events-none" : ""}`}

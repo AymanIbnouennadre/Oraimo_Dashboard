@@ -18,19 +18,19 @@ const MA_PHONE_REGEX = /^0[67]\d{8}$/ // 06/07 + 8 chiffres
 type FormErrors = { phone?: string; password?: string; general?: string }
 
 const MSG = {
-  INVALID_CREDENTIALS: "Identifiants invalides.",
-  PHONE_NOT_FOUND: "Numéro introuvable.",
-  PASSWORD_BAD: "Mot de passe incorrect.",
-  ACCESS_DENIED: "Accès réservé aux administrateurs.",
-  ACCOUNT_LOCKED: "Compte verrouillé ou désactivé. Contactez l’administrateur.",
-  TOO_MANY: "Trop de tentatives. Réessayez plus tard.",
-  SERVER: "Service temporairement indisponible. Réessayez plus tard.",
-  NETWORK: "Problème de connexion. Vérifiez votre réseau.",
-  TIMEOUT: "Délai dépassé. Réessayez.",
-  TOKEN_INVALID: "Réponse invalide du serveur (token manquant).",
-  PHONE_FORMAT: "Le numéro doit commencer par 06 ou 07 et contenir exactement 10 chiffres.",
-  PHONE_REQUIRED: "Veuillez saisir votre numéro de téléphone.",
-  PASSWORD_REQUIRED: "Veuillez saisir votre mot de passe.",
+  INVALID_CREDENTIALS: "Invalid credentials.",
+  PHONE_NOT_FOUND: "Phone number not found.",
+  PASSWORD_BAD: "Incorrect password.",
+  ACCESS_DENIED: "Access restricted to administrators.",
+  ACCOUNT_LOCKED: "Account locked or disabled. Contact the administrator.",
+  TOO_MANY: "Too many attempts. Try again later.",
+  SERVER: "Service temporarily unavailable. Try again later.",
+  NETWORK: "Connection problem. Check your network.",
+  TIMEOUT: "Timeout exceeded. Try again.",
+  TOKEN_INVALID: "Invalid server response (missing token).",
+  PHONE_FORMAT: "The number must start with 06 or 07 and contain exactly 10 digits.",
+  PHONE_REQUIRED: "Please enter your phone number.",
+  PASSWORD_REQUIRED: "Please enter your password.",
 }
 
 function setCookie(name: string, value: string, maxAgeSeconds: number) {
@@ -38,7 +38,7 @@ function setCookie(name: string, value: string, maxAgeSeconds: number) {
   document.cookie = `${name}=${value}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`
 }
 
-// --- Helpers JWT (pour vérifier ADMIN côté UI)
+// --- JWT Helpers (to verify ADMIN on UI side)
 function decodeJwt(token: string): any | null {
   try {
     const payload = token.split(".")[1]
@@ -65,7 +65,7 @@ function extractRole(payload: any): string | null {
   return role
 }
 
-// --- Convertit la réponse backend en erreurs "propres"
+// --- Converts backend response into clean errors
 async function toFriendlyErrors(res: Response): Promise<FormErrors> {
   let data: any = undefined
   let text = ""
@@ -173,7 +173,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background p-4">
-      {/* 🔥 Overlay plein écran pendant login */}
+      {/* Full screen overlay during login */}
       <LoadingOverlay show={isLoading} label="Signing in…" />
 
       <Card className="w-full max-w-md shadow-xl border-0 bg-card/80 backdrop-blur">

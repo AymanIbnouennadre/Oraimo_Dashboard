@@ -49,15 +49,15 @@ function decodeJwt(token: string): any | null {
 function getUserIdFromToken(token: string): number | null {
   const payload = decodeJwt(token)
   
-  // Votre backend met l'ID dans le claim 'uid'
+  // Your backend puts the ID in the 'uid' claim
   const uid = payload?.uid
   
   if (uid !== undefined && uid !== null) {
-    // Si uid est déjà un nombre
+    // If uid is already a number
     if (typeof uid === "number" && !Number.isNaN(uid)) {
       return uid
     }
-    // Si uid est une string, essayer de la convertir
+    // If uid is a string, try to convert it
     if (typeof uid === "string") {
       const numericId = Number(uid)
       if (!Number.isNaN(numericId)) {
@@ -66,7 +66,7 @@ function getUserIdFromToken(token: string): number | null {
     }
   }
   
-  // Fallback sur 'sub' si 'uid' n'est pas présent
+  // Fallback to 'sub' if 'uid' is not present
   const sub = payload?.sub
   if (sub !== undefined && sub !== null) {
     const numericId = Number(sub)
@@ -102,7 +102,7 @@ export default function AccountPage() {
     confirmPassword: "",
   })
 
-  // ---- Charger l'utilisateur courant via GET /api/users/{id}
+  // ---- Load current user via GET /api/users/{id}
   useEffect(() => {
     const token = getCookie("oraimo_token")
     
@@ -165,7 +165,7 @@ export default function AccountPage() {
     setError("")
     setProfileSuccess(false)
 
-    // Validation du téléphone
+    // Phone validation
     const phone = profileData.phone.replace(/\D/g, "")
     if (phone && !MA_PHONE_REGEX.test(phone)) {
       setError("Phone number must start with 06/07 and contain exactly 10 digits.")
@@ -222,7 +222,7 @@ export default function AccountPage() {
       if (err instanceof TypeError && err.message.includes('fetch')) {
         setError(`Unable to connect to server for saving.`)
       } else {
-        setError(`Erreur réseau lors de la sauvegarde.`)
+        setError(`Network error while saving.`)
       }
     } finally {
       setIsLoadingProfile(false)
@@ -256,7 +256,7 @@ export default function AccountPage() {
     }
 
     setIsLoadingPassword(true)
-    // Simulation - remplacer par un vrai appel API quand disponible
+    // Simulation - replace with real API call when available
     await new Promise((r) => setTimeout(r, 800))
     setIsLoadingPassword(false)
     setPasswordSuccess(true)
@@ -296,7 +296,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <form onSubmit={handleProfileSubmit} className="space-y-6">
-              {/* Première ligne : First Name, Last Name, Email */}
+              {/* First row: First Name, Last Name, Email */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="firstName" className="text-sm font-medium text-foreground">
@@ -341,7 +341,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {/* Deuxième ligne : Phone, Address, Role */}
+              {/* Second row: Phone, Address, Role */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-sm font-medium text-foreground">

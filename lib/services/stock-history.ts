@@ -152,7 +152,7 @@ export class StockHistoryService {
   private static readonly BASE_PATH = "/api/history-stock"
 
   /**
-   * Crée une nouvelle entrée d'historique de stock
+   * Create a new stock history entry
    * POST /api/history-stock
    */
   static async createStockHistory(data: CreateStockHistoryRequest): Promise<StockHistory> {
@@ -163,7 +163,7 @@ export class StockHistoryService {
   }
 
   /**
-   * Récupère une entrée d'historique par ID
+   * Retrieve a stock history entry by ID
    * GET /api/history-stock/{id}
    */
   static async getStockHistoryById(id: number): Promise<StockHistory> {
@@ -171,7 +171,7 @@ export class StockHistoryService {
   }
 
   /**
-   * Liste tout l'historique de stock avec pagination optionnelle
+   * List all stock history with optional pagination
    * GET /api/history-stock
    */
   static async getAllStockHistory(
@@ -194,7 +194,7 @@ export class StockHistoryService {
   }
 
   /**
-   * Met à jour une entrée d'historique existante
+   * Update an existing stock history entry
    * PUT /api/history-stock/{id}
    */
   static async updateStockHistory(id: number, data: UpdateStockHistoryRequest): Promise<StockHistory> {
@@ -205,7 +205,7 @@ export class StockHistoryService {
   }
 
   /**
-   * Supprime une entrée d'historique
+   * Delete a stock history entry
    * DELETE /api/history-stock/{id}
    */
   static async deleteStockHistory(id: number): Promise<void> {
@@ -215,7 +215,7 @@ export class StockHistoryService {
   }
 
   /**
-   * Recherche avec filtres avancés
+   * Search with advanced filters
    * GET /api/history-stock/search
    */
   static async searchStockHistory(
@@ -227,7 +227,7 @@ export class StockHistoryService {
   ): Promise<PaginatedResponse<StockHistory>> {
     const params = new URLSearchParams()
 
-    // Ajouter les filtres
+    // Add filters
     if (filters.movementType) params.append("movementType", filters.movementType)
     if (filters.createdFrom) params.append("createdFrom", filters.createdFrom)
     if (filters.createdTo) params.append("createdTo", filters.createdTo)
@@ -239,7 +239,7 @@ export class StockHistoryService {
     if (filters.detectionId !== undefined) params.append("detectionId", filters.detectionId.toString())
     if (filters.userNameLike) params.append("userNameLike", filters.userNameLike)
 
-    // Ajouter les paramètres de pagination et tri
+    // Add pagination and sorting parameters
     if (page !== undefined) params.append("page", page.toString())
     if (size !== undefined) params.append("size", size.toString())
     if (sortBy) params.append("sortBy", sortBy)
@@ -260,8 +260,8 @@ export class StockHistoryService {
     totalSales: number
     totalAmount: number
   }> {
-    // Cette méthode pourrait être implémentée avec une API dédiée aux statistiques
-    // Pour l'instant, on simule en récupérant toutes les données
+    // This method could be implemented with a dedicated statistics API
+    // For now, we simulate by retrieving all data
     const response = await this.getAllStockHistory(0, 1000)
     const movements = response.content
 
