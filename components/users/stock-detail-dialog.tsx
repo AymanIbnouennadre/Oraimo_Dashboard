@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { toast } from "react-toastify";
+import { useToast } from "@/hooks/use-toast";
 import { getCookie } from "@/components/auth/auth-provider";
 
 interface StockDetailDialogProps {
@@ -24,6 +24,8 @@ export function StockDetailDialog({ userId, open, onOpenChange }: StockDetailDia
   const [totalStock, setTotalStock] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [stockDetails, setStockDetails] = useState<any[]>([]);
+
+  const { toast } = useToast()
 
   useEffect(() => {
     if (userId && open) {
@@ -60,7 +62,11 @@ export function StockDetailDialog({ userId, open, onOpenChange }: StockDetailDia
         })
         .catch((error) => {
           console.error(error);
-          toast.error("Failed to load stock details. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to load stock details. Please try again.",
+            variant: "destructive",
+          })
           setTotalStock(0);
           setTotalPoints(0);
           setStockDetails([]);

@@ -43,7 +43,7 @@ import {
   Phone,
   TrendingUp
 } from "lucide-react"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import { ModelHistory, ModelHistoryService, ModelHistoryError } from "@/lib/services/model-history-service"
 import { formatNumber } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -59,6 +59,7 @@ export function DetectionTable({
   onDetectionDeleted,
   onViewDetails 
 }: DetectionTableProps) {
+  const { toast } = useToast()
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [deletingDetection, setDeletingDetection] = React.useState<ModelHistory | null>(null)
   const [isDeleting, setIsDeleting] = React.useState(false)
@@ -74,16 +75,26 @@ export function DetectionTable({
     setIsDeleting(true)
     try {
       await ModelHistoryService.deleteModelHistory(deletingDetection.id)
-      toast.success("Detection deleted successfully")
+      toast({
+        title: "Success",
+        description: "Detection deleted successfully!",
+        variant: "default",
+      })
       onDetectionDeleted()
     } catch (error) {
       console.error("Error deleting detection:", error)
       if (error instanceof ModelHistoryError) {
-        toast.error("Delete failed", {
-          description: error.message
+        toast({
+          title: "Delete Failed",
+          description: `Delete failed: ${error.message}`,
+          variant: "destructive",
         })
       } else {
-        toast.error("Failed to delete detection")
+        toast({
+          title: "Error",
+          description: "Failed to delete detection",
+          variant: "destructive",
+        })
       }
     } finally {
       setIsDeleting(false)

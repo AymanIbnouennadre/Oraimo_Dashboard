@@ -8,7 +8,7 @@ import { UsersFilters } from "@/components/users/users-filters"
 import { UserFormDialog } from "@/components/users/user-form-dialog"
 import { StockDetailDialog } from "@/components/users/stock-detail-dialog"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/auth/auth-provider"
 import type { User, UserFilter, PaginatedResponse } from "@/lib/types"
 import { userService } from "@/lib/services/user-service"
@@ -17,6 +17,7 @@ const ITEMS_PER_PAGE = 10
 
 export default function UsersManagementPage() {
   const { session } = useAuth()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState<User[]>([])
   const [allUsers, setAllUsers] = useState<User[]>([]) // Tous les utilisateurs de l'API
@@ -116,7 +117,11 @@ export default function UsersManagementPage() {
       setUsers([])
       setAllUsers([])
       setTotalUsers(0)
-      toast.error('Failed to load users from database. Please check your connection.')
+      toast({
+        title: "Error",
+        description: 'Failed to load users from database. Please check your connection.',
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -148,10 +153,18 @@ export default function UsersManagementPage() {
         user.id === userId ? { ...user, status: newStatus } : user
       ))
       
-      toast.success(`User ${newStatus.toLowerCase()} successfully`)
+      toast({
+        title: "Success",
+        description: `User ${newStatus.toLowerCase()} successfully`,
+        variant: "default",
+      })
     } catch (error) {
       console.error('Error toggling user status:', error)
-      toast.error('Failed to update user status')
+      toast({
+        title: "Error",
+        description: 'Failed to update user status',
+        variant: "destructive",
+      })
     }
   }
 

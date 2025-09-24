@@ -18,7 +18,7 @@ import {
   AlertCircle,
   Activity
 } from "lucide-react"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import { 
   ModelHistory, 
   ModelHistoryService, 
@@ -69,6 +69,8 @@ export default function ModelPage() {
   const [isSearching, setIsSearching] = React.useState(false)
   const [selectedDetection, setSelectedDetection] = React.useState<EnrichedModelHistory | null>(null)
   const [error, setError] = React.useState<string | null>(null)
+
+  const { toast } = useToast()
 
   // Pagination state
   const [currentPage, setCurrentPage] = React.useState(0)
@@ -129,8 +131,10 @@ export default function ModelPage() {
         ? error.message 
         : "Failed to load model detections"
       setError(errorMessage)
-      toast.error("Failed to load detections", {
-        description: errorMessage
+      toast({
+        title: "Error",
+        description: `Failed to load detections: ${errorMessage}`,
+        variant: "destructive",
       })
     } finally {
       setIsLoading(false)
@@ -164,15 +168,21 @@ export default function ModelPage() {
       setCurrentPage(response.number)
       setTotalPages(response.totalPages)
       setTotalElements(response.totalElements)
-      toast.success(`Found ${response.totalElements} detection(s)`)
+      toast({
+        title: "Success",
+        description: `Found ${response.totalElements} detection(s)`,
+        variant: "default",
+      })
     } catch (error) {
       console.error("Error searching detections:", error)
       const errorMessage = error instanceof ModelHistoryError 
         ? error.message 
         : "Failed to search detections"
       setError(errorMessage)
-      toast.error("Search failed", {
-        description: errorMessage
+      toast({
+        title: "Error",
+        description: `Search failed: ${errorMessage}`,
+        variant: "destructive",
       })
     } finally {
       setIsSearching(false)
@@ -219,7 +229,11 @@ export default function ModelPage() {
       setSelectedDetection({ ...detection, user, product });
     } catch (error) {
       console.error("Error enriching detection:", error);
-      toast.error("Failed to load additional details.");
+      toast({
+        title: "Error",
+        description: "Failed to load additional details.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -227,7 +241,11 @@ export default function ModelPage() {
     setFilters({})
     loadDetections(0)
     loadStats()
-    toast.success("Data refreshed")
+    toast({
+      title: "Success",
+      description: "Data refreshed",
+      variant: "default",
+    })
   }
 
   const handlePageChange = (page: number) => {
@@ -247,7 +265,11 @@ export default function ModelPage() {
         setTotalElements(response.totalElements)
       }).catch(error => {
         console.error("Error changing page:", error)
-        toast.error("Failed to load page")
+        toast({
+          title: "Error",
+          description: "Failed to load page",
+          variant: "destructive",
+        })
       }).finally(() => {
         setIsSearching(false)
       })
@@ -259,11 +281,23 @@ export default function ModelPage() {
 
   const testAPI = async () => {
     try {
-      toast.info("Testing API connection...")
+      toast({
+        title: "Info",
+        description: "Testing API connection...",
+        variant: "default",
+      })
       const testResult = await ModelHistoryService.getAllModelHistory(0, 1)
-      toast.success(`API Test Success! Found ${testResult.totalElements} records`)
+      toast({
+        title: "Success",
+        description: `API Test Success! Found ${testResult.totalElements} records`,
+        variant: "default",
+      })
     } catch (error) {
-      toast.error(`API Test Failed: ${error instanceof ModelHistoryError ? error.message : 'Unknown error'}`)
+      toast({
+        title: "Error",
+        description: `API Test Failed: ${error instanceof ModelHistoryError ? error.message : 'Unknown error'}`,
+        variant: "destructive",
+      })
     }
   }
 

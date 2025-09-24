@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 import type { Product } from "@/lib/types"
 
 interface ProductFormDialogProps {
@@ -19,6 +20,7 @@ interface ProductFormDialogProps {
 }
 
 export function ProductFormDialog({ product, open, onOpenChange, onSave }: ProductFormDialogProps) {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState({
@@ -129,8 +131,20 @@ export function ProductFormDialog({ product, open, onOpenChange, onSave }: Produ
 
       await onSave(productData)
       onOpenChange(false)
+      
+      // Show success toast
+      toast({
+        title: "Success",
+        description: product ? "Product updated successfully!" : "Product created successfully!",
+        variant: "default",
+      })
     } catch (err) {
       setError("An error occurred while saving")
+      toast({
+        title: "Error",
+        description: "Failed to save product. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }

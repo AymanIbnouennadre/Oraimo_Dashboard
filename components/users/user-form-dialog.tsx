@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import type { User, CreateUserRequest, UpdateUserRequest } from "@/lib/types"
 import { userService } from "@/lib/services/user-service"
 
@@ -19,6 +19,7 @@ interface UserFormDialogProps {
 }
 
 export function UserFormDialog({ user, open, onOpenChange, onSuccess }: UserFormDialogProps) {
+  const { toast } = useToast()
   const isEdit = !!user
   const [loading, setLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{
@@ -144,7 +145,11 @@ export function UserFormDialog({ user, open, onOpenChange, onSuccess }: UserForm
         }
         
         await userService.update(user.id, updateData)
-        toast.success("User updated successfully")
+        toast({
+          title: "Success",
+          description: "User updated successfully!",
+          variant: "default",
+        })
       } else {
         // Create new user
         console.log('Creating user with data:', formData)
@@ -164,7 +169,11 @@ export function UserFormDialog({ user, open, onOpenChange, onSuccess }: UserForm
         
         const response = await userService.create(createRequest)
         console.log('User creation response:', response)
-        toast.success("User created successfully! A welcome email has been sent with login details.")
+        toast({
+          title: "Success",
+          description: "User created successfully! A welcome email has been sent with login details.",
+          variant: "default",
+        })
       }
       
       onSuccess()
@@ -219,7 +228,11 @@ export function UserFormDialog({ user, open, onOpenChange, onSuccess }: UserForm
         }
       }
       
-      toast.error(errorMessage)
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }

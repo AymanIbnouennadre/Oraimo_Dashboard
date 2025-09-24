@@ -4,6 +4,8 @@ import { Space_Grotesk, DM_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { AuthProvider } from "@/components/auth/auth-provider"
+import { NavigationProvider } from "@/components/navigation-provider"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const spaceGrotesk = Space_Grotesk({
@@ -33,7 +35,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${spaceGrotesk.variable} ${dmSans.variable} antialiased`}>
         <AuthProvider>
-          <Suspense fallback={null}>{children}</Suspense>
+          <NavigationProvider>
+            <Suspense fallback={null}>{children}</Suspense>
+            <Toaster />
+          </NavigationProvider>
         </AuthProvider>
         <Analytics />
       </body>

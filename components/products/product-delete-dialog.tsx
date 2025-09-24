@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Trash2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 import type { Product } from "@/lib/types"
 
 interface ProductDeleteDialogProps {
@@ -27,11 +28,20 @@ export function ProductDeleteDialog({
   onConfirm, 
   isLoading = false 
 }: ProductDeleteDialogProps) {
+  const { toast } = useToast()
+
   if (!product) return null
 
   const handleConfirm = () => {
     onConfirm(product.id)
     onOpenChange(false)
+    
+    // Show success toast
+    toast({
+      title: "Success",
+      description: `Product "${product.marketingName}" deleted successfully!`,
+      variant: "default",
+    })
   }
 
   return (

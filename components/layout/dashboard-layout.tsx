@@ -32,6 +32,8 @@ import { Home, Users, Package, Warehouse, Brain, Settings, LogOut, User, Chevron
 import { useAuth } from "@/components/auth/auth-provider"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import Link from "next/link"
+import { userService } from "@/lib/services/user-service"
+import type { UserResponse } from "@/lib/types"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -42,15 +44,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
   const [mounted, setMounted] = useState(false)
-
-  // Wait for client-side hydration
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return null // or a loader
-  }
+  const [currentUser, setCurrentUser] = useState<UserResponse | null>(null)
+  const [userLoading, setUserLoading] = useState(false)
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
 
   const navigationItems = [
     {
@@ -97,6 +93,46 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     },
   ]
 
+  // Wait for client-side hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Load current user information
+  useEffect(() => {
+    const loadCurrentUser = async () => {
+      if (session?.user?.userId && mounted) {
+        setUserLoading(true)
+        try {
+          const userData = await userService.getById(Number(session.user.userId))
+          setCurrentUser(userData)
+        } catch (error) {
+          console.error("Failed to load current user:", error)
+          // Fallback: keep current user as null, will show default values
+        } finally {
+          setUserLoading(false)
+        }
+      }
+    }
+
+    loadCurrentUser()
+  }, [session?.user?.userId, mounted])
+
+  // Set open sections based on current path
+  useEffect(() => {
+    const newOpen: Record<string, boolean> = {}
+    navigationItems.forEach(item => {
+      if (item.items) {
+        newOpen[item.title] = false
+      }
+    })
+    setOpenSections(newOpen)
+  }, [pathname])
+
+  if (!mounted) {
+    return null // or a loader
+  }
+
   return (
     <SidebarProvider>
       {/* Full screen overlay during logout */}
@@ -110,8 +146,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Image
                 src="/logo.png"
                 alt="Oraimo Logo"
-                width={120}
-                height={120}
+                width={170}
+                height={170}
                 className="object-contain"
                 priority
               />
@@ -123,12 +159,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title} className="mb-1">
                   {item.items ? (
-                    <Collapsible key={`${item.title}-${item.isActive}`} defaultOpen={item.isActive}>
+                    <Collapsible open={openSections[item.title] || false} onOpenChange={(open) => setOpenSections(prev => ({...prev, [item.title]: open}))}>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="h-11 rounded-lg font-medium transition-all hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground">
+                        <SidebarMenuButton className="h-11 rounded-lg font-medium transition-all hover:bg-accent hover:text-accent-foreground">
                           <item.icon className="h-5 w-5" />
                           <span className="text-sm">{item.title}</span>
-                          <ChevronRight className="ml-auto h-4 w-4 transition-transform data-[state=open]:rotate-90" />
+                          <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${openSections[item.title] ? 'rotate-90' : ''}`} />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -178,11 +214,23 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="text-sm bg-primary text-primary-foreground">
-                          {session?.user?.role?.charAt(0) || "A"}
+                          {userLoading 
+                            ? "..." 
+                            : currentUser 
+                              ? `${currentUser.firstName?.charAt(0) || ""}${currentUser.lastName?.charAt(0) || ""}`.toUpperCase() || "A"
+                              : session?.user?.role?.charAt(0) || "A"
+                          }
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col items-start text-left flex-1">
-                        <span className="text-sm font-medium text-foreground">Admin User</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {userLoading 
+                            ? "Loading..." 
+                            : currentUser 
+                              ? `${currentUser.firstName} ${currentUser.lastName}` 
+                              : "Admin User"
+                          }
+                        </span>
                         <span className="text-xs text-muted-foreground">{session?.user?.role}</span>
                       </div>
                     </button>

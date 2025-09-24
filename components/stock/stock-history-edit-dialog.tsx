@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import { Loader2, Edit, AlertCircle, Clock } from "lucide-react"
 
 interface StockHistoryEditDialogProps {
@@ -37,6 +37,7 @@ export function StockHistoryEditDialog({
   onClose,
   onSuccess 
 }: StockHistoryEditDialogProps) {
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -91,7 +92,11 @@ export function StockHistoryEditDialog({
 
       await StockHistoryService.updateStockHistory(movement.id, updateData)
       
-      toast.success("Stock movement updated successfully")
+      toast({
+        title: "Success",
+        description: "Stock movement updated successfully!",
+        variant: "default",
+      })
       onSuccess()
       onClose()
     } catch (error) {
@@ -103,19 +108,25 @@ export function StockHistoryEditDialog({
         
         // Show toast for specific errors
         if (error.status === 400 && error.message.includes('24-hour deadline')) {
-          toast.error("Cannot edit: 24-hour deadline expired", {
-            description: "This movement can no longer be modified as it was created more than 24 hours ago."
+          toast({
+            title: "Update Not Allowed",
+            description: "Cannot edit: 24-hour deadline expired - This movement can no longer be modified as it was created more than 24 hours ago.",
+            variant: "destructive",
           })
         } else {
-          toast.error("Update failed", {
-            description: error.message
+          toast({
+            title: "Update Failed",
+            description: `Update failed: ${error.message}`,
+            variant: "destructive",
           })
         }
       } else {
         const errorMessage = "An unexpected error occurred while updating the stock movement."
         setError(errorMessage)
-        toast.error("Update failed", {
-          description: errorMessage
+        toast({
+          title: "Update Failed",
+          description: `Update failed: ${errorMessage}`,
+          variant: "destructive",
         })
       }
     } finally {

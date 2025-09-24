@@ -10,12 +10,14 @@ import { ProductFormDialog } from "@/components/products/product-form-dialog"
 import { ProductViewDrawer } from "@/components/products/product-view-drawer"
 import { ProductDeleteDialog } from "@/components/products/product-delete-dialog"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
+import { useToast } from "@/hooks/use-toast"
 import type { Product, ProductFilter } from "@/lib/types"
 import { productService } from "@/lib/services/product-service"
 
 const ITEMS_PER_PAGE = 12
 
 export default function ProductsManagementPage() {
+  const { toast } = useToast()
   const [products, setProducts] = useState<Product[]>([])
   const [filters, setFilters] = useState<ProductFilter>({})
   const [currentPage, setCurrentPage] = useState(1)
@@ -105,9 +107,19 @@ export default function ProductsManagementPage() {
       await productService.delete(productId)
       await loadProducts()
       setProductToDelete(null)
+      toast({
+        title: "Success",
+        description: "Product deleted successfully!",
+        variant: "default",
+      })
     } catch (err) {
       console.error('Error deleting product:', err)
       setError('Error deleting product')
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsDeleting(false)
     }
@@ -118,6 +130,11 @@ export default function ProductsManagementPage() {
       if (selectedProduct) {
         // Update existing product
         await productService.update(selectedProduct.id, productData)
+        toast({
+          title: "Success",
+          description: "Product updated successfully!",
+          variant: "default",
+        })
       } else {
         // Create new product - convert to CreateProductRequest format
         const createRequest = {
@@ -134,12 +151,22 @@ export default function ProductsManagementPage() {
           pointsBronze: productData.pointsBronze || 0,
         }
         await productService.create(createRequest)
+        toast({
+          title: "Success",
+          description: "Product created successfully!",
+          variant: "default",
+        })
       }
       
       // Reload products to show changes
       await loadProducts()
     } catch (err) {
       console.error('Error saving product:', err)
+      toast({
+        title: "Error",
+        description: "Failed to save product. Please try again.",
+        variant: "destructive",
+      })
       throw new Error('Error saving product')
     }
   }

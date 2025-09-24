@@ -5,6 +5,7 @@ import { StockTable } from "@/components/stock/stock-table"
 import { StockFilters } from "@/components/stock/stock-filters"
 import { StockHistoryService } from "@/lib/services/stock-history"
 import { enrichStockHistory } from "@/lib/utils/stock-utils"
+import { useToast } from "@/hooks/use-toast"
 import type { StockHistory, StockHistoryFilters, Product, User } from "@/lib/types"
 
 export default function StockPage() {
@@ -12,6 +13,8 @@ export default function StockPage() {
   const [allMovements, setAllMovements] = useState<StockHistory[]>([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState<StockHistoryFilters>({})
+
+  const { toast } = useToast()
 
   // Load initial data once on component mount
   useEffect(() => {
@@ -113,8 +116,18 @@ export default function StockPage() {
       await StockHistoryService.deleteStockHistory(id)
       setMovements(movements.filter((m) => m.id !== id))
       setAllMovements(allMovements.filter((m) => m.id !== id))
+      toast({
+        title: "Success",
+        description: "Stock movement deleted successfully!",
+        variant: "default",
+      })
     } catch (error) {
       console.error("Failed to delete movement:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete stock movement. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
