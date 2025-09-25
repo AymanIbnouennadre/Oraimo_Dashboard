@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const queryString = params.toString()
-    const endpoint = queryString ? `${BACKEND_URL}/api/stock-history/search?${queryString}` : `${BACKEND_URL}/api/stock-history/search`
+    const endpoint = queryString ? `${BACKEND_URL}/api/history-stock/search?${queryString}` : `${BACKEND_URL}/api/history-stock/search`
 
     const response = await fetch(endpoint, {
       headers: {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const token = getAuthToken()
     const body = await request.json()
 
-    const response = await fetch(`${BACKEND_URL}/api/stock-history/search`, {
+    const response = await fetch(`${BACKEND_URL}/api/history-stock/search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

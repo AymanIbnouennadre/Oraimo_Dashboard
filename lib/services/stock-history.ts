@@ -7,7 +7,7 @@ import type {
   PaginatedResponse 
 } from "@/lib/types"
 
-const BACKEND_URL = ""
+const getBackendUrl = () => ""
 
 // Helper function to get auth token from cookies
 function getAuthToken(): string | null {
@@ -90,8 +90,10 @@ async function apiRequest<T>(
 ): Promise<T> {
   const token = getAuthToken()
   
+  const backendUrl = getBackendUrl()
+  
   try {
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    const response = await fetch(`${backendUrl}${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
         ...(token && { "Authorization": `Bearer ${token}` }),
@@ -149,11 +151,11 @@ async function apiRequest<T>(
 }
 
 export class StockHistoryService {
-  private static readonly BASE_PATH = "/api/history-stock"
+  private static readonly BASE_PATH = "/api/stock-history"
 
   /**
    * Create a new stock history entry
-   * POST /api/history-stock
+   * POST /api/stock-history
    */
   static async createStockHistory(data: CreateStockHistoryRequest): Promise<StockHistory> {
     return apiRequest<StockHistory>(this.BASE_PATH, {
@@ -164,7 +166,7 @@ export class StockHistoryService {
 
   /**
    * Retrieve a stock history entry by ID
-   * GET /api/history-stock/{id}
+   * GET /api/stock-history/{id}
    */
   static async getStockHistoryById(id: number): Promise<StockHistory> {
     return apiRequest<StockHistory>(`${this.BASE_PATH}/${id}`)
@@ -172,7 +174,7 @@ export class StockHistoryService {
 
   /**
    * List all stock history with optional pagination
-   * GET /api/history-stock
+   * GET /api/stock-history
    */
   static async getAllStockHistory(
     page?: number,
@@ -195,7 +197,7 @@ export class StockHistoryService {
 
   /**
    * Update an existing stock history entry
-   * PUT /api/history-stock/{id}
+   * PUT /api/stock-history/{id}
    */
   static async updateStockHistory(id: number, data: UpdateStockHistoryRequest): Promise<StockHistory> {
     return apiRequest<StockHistory>(`${this.BASE_PATH}/${id}`, {
@@ -206,7 +208,7 @@ export class StockHistoryService {
 
   /**
    * Delete a stock history entry
-   * DELETE /api/history-stock/{id}
+   * DELETE /api/stock-history/{id}
    */
   static async deleteStockHistory(id: number): Promise<void> {
     return apiRequest<void>(`${this.BASE_PATH}/${id}`, {
@@ -216,7 +218,7 @@ export class StockHistoryService {
 
   /**
    * Search with advanced filters
-   * GET /api/history-stock/search
+   * GET /api/stock-history/search
    */
   static async searchStockHistory(
     filters: StockHistoryFilters,
