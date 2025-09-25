@@ -314,7 +314,7 @@ export function StockMovementDetails({ movementId }: Props) {
             <div className="w-20 h-20 rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
               {movement.productImage ? (
                 <Image
-                  src={movement.productImage}
+                  src={movement.productImage.startsWith('/') ? movement.productImage : `/${movement.productImage}`}
                   alt={movement.productMarketingName || 'Product'}
                   width={80}
                   height={80}

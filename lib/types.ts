@@ -186,6 +186,12 @@ export interface StockHistory {
   // Extended fields for UI (populated from relations)
   userName?: string
   productMarketingName?: string
+  productImage?: string
+  productRetailPrice?: number
+  productFinalCustomerPrice?: number
+  productPoints?: number
+  pointsStoreTier?: string
+  userTier?: string
 }
 
 export interface CreateStockHistoryRequest {

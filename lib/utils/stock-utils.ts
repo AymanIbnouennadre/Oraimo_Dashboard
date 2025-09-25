@@ -43,12 +43,48 @@ export function getProductMarketingName(productId: number): string {
   return product?.marketingName || `Produit ${productId}`
 }
 
+export function getProductImage(productId: number): string {
+  const product = (productsData as Product[]).find(p => p.id === productId)
+  const image = product?.image || '/placeholder.jpg'
+  return image.startsWith('/') ? image : `/${image}`
+}
+
+export function getProductRetailPrice(productId: number): number | undefined {
+  const product = (productsData as Product[]).find(p => p.id === productId)
+  return product?.retailPrice
+}
+
+export function getProductFinalCustomerPrice(productId: number): number | undefined {
+  const product = (productsData as Product[]).find(p => p.id === productId)
+  return product?.finalCustomerPrice
+}
+
+export function getProductPoints(productId: number, tier: string): number {
+  const product = (productsData as Product[]).find(p => p.id === productId)
+  if (!product) return 0
+  
+  switch (tier?.toLowerCase()) {
+    case 'gold':
+      return product.pointsGold
+    case 'silver':
+      return product.pointsSilver
+    case 'bronze':
+      return product.pointsBronze
+    default:
+      return product.pointsBronze // Default to bronze
+  }
+}
+
 // Fonction pour enrichir les données d'historique stock avec les noms
 export function enrichStockHistory(stockHistory: StockHistory[]): StockHistory[] {
   return stockHistory.map(item => ({
     ...item,
     userName: getUserFullName(item.userId),
-    productMarketingName: getProductMarketingName(item.productId)
+    productMarketingName: getProductMarketingName(item.productId),
+    productImage: getProductImage(item.productId),
+    productRetailPrice: getProductRetailPrice(item.productId),
+    productFinalCustomerPrice: getProductFinalCustomerPrice(item.productId),
+    productPoints: getProductPoints(item.productId, 'gold') // Default to gold, can be updated based on user tier
   }))
 }
 
@@ -57,6 +93,10 @@ export function enrichSingleStockHistory(item: StockHistory): StockHistory {
   return {
     ...item,
     userName: getUserFullName(item.userId),
-    productMarketingName: getProductMarketingName(item.productId)
+    productMarketingName: getProductMarketingName(item.productId),
+    productImage: getProductImage(item.productId),
+    productRetailPrice: getProductRetailPrice(item.productId),
+    productFinalCustomerPrice: getProductFinalCustomerPrice(item.productId),
+    productPoints: getProductPoints(item.productId, 'gold')
   }
 }
